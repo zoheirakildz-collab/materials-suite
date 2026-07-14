@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Unit Converter</title>
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --glass-card: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-glow: #f8fafc;
+            --text-dim: #94a3b8;
+            --glow-indigo: #6366f1;
+            --glow-cyan: #06b6d4;
+            --glow-purple: #a855f7;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 95% 90%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+            color: var(--text-glow);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 96%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            width: 100%;
+        }
+
+        .top-nav h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.03em;
+        }
+
+        .top-nav p {
+            color: var(--text-dim);
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--text-dim);
+        }
+
+        .studio-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 1.5rem;
+            width: 100%;
+            align-items: start;
+        }
+
+        .control-stack {
+            flex: 0 0 44%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .visualization-column {
+            flex: 0 0 56%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .glass-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .glass-card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            color: var(--text-glow);
+        }
+
+        .form-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, textarea {
+            background-color: rgba(10, 15, 30, 0.5);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.6rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        select:focus, textarea:focus {
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+        }
+
+        textarea {
+            height: 250px;
+            resize: none;
+            font-family: monospace;
+            line-height: 1.5;
+        }
+
+        button {
+            color: white;
+            border: none;
+            padding: 0.7rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 100%;
+            box-sizing: border-box;
+            background: linear-gradient(135deg, var(--glow-indigo), #4f46e5);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="top-nav">
+            <div>
+                <h1>Batch Unit Converter</h1>
+                <p>Convert bulk data arrays simultaneously across standard ab-initio simulation units.</p>
+            </div>
+            <a href="index.html" class="back-btn">← Back to Overview</a>
+        </header>
+
+        <!-- التخطيط الأفقي المتوازن والمستغل لعرض الشاشة بالكامل -->
+        <section class="studio-layout">
+            
+            <!-- العمود الأيسر: إدخال البيانات واختيار نمط التحويل -->
+            <div class="control-stack">
+                <div class="glass-card">
+                    <h2>Configuration & Input Array</h2>
+                    
+                    <div class="form-panel">
+                        <label>Conversion Vector Mode</label>
+                        <select id="conversionMode">
+                            <option value="ry_ev">Rydberg (Ry) → Electron-volt (eV)</option>
+                            <option value="ev_ry">Electron-volt (eV) → Rydberg (Ry)</option>
+                            <option value="bohr_ang">Bohr → Angstrom (Å)</option>
+                            <option value="ang_bohr">Angstrom (Å) → Bohr</option>
+                            <option value="bo3_ang3">Bohr³ → Angstrom³ (Å³)</option>
+                            <option value="ang3_bo3">Angstrom³ (Å³) → Bohr³</option>
+                            <option value="gpa_bar">Gigapascal (GPa) → Bar</option>
+                            <option value="bar_gpa">Bar → Gigapascal (GPa)</option>
+                            <option value="cm_thz">Wavenumber (cm⁻¹) → Terahertz (THz)</option>
+                            <option value="thz_cm">Terahertz (THz) → Wavenumber (cm⁻¹)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-panel">
+                        <label>Paste Input Values (One value per line)</label>
+                        <textarea id="inputBatch" placeholder="690.2167&#10;710.4532&#10;725.1104"></textarea>
+                    </div>
+
+                    <button type="button" onclick="executeBatchConversion()">Convert Dataset Array</button>
+                </div>
+            </div>
+
+            <!-- العمود الأيمن: مخرجات التحويل دفعة واحدة ليسهل نسخها مباشرة -->
+            <div class="visualization-column">
+                <div class="glass-card">
+                    <h2>Converted Output Dataset</h2>
+                    <div class="form-panel">
+                        <label>Output Array Vector (Copy directly)</label>
+                        <textarea id="outputBatch" placeholder="Converted results will stream here..." readonly onclick="this.select()"></textarea>
+                    </div>
+                    <p style="margin: 0; font-size: 0.8rem; color: var(--text-dim);">💡 Tip: Click inside the output framework box to auto-select all values for fast copying.</p>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        // دالة المحرك الرياضي الصارم للتحويلات الفيزيائية
+        function executeBatchConversion() {
+            const mode = document.getElementById("conversionMode").value;
+            const rawInput = document.getElementById("inputBatch").value.trim();
+            const outputArea = document.getElementById("outputBatch");
+
+            if (!rawInput) {
+                alert("Please paste or input a valid numerical array dataset.");
+                return;
+            }
+
+            // الثوابت الفيزيائية الدقيقة المعتمدة عالمياً وفي الفيان
+            const RY_TO_EV = 13.605693122994;
+            const BOHR_TO_ANG = 0.529177210903;
+            const BOHR3_TO_ANG3 = Math.pow(BOHR_TO_ANG, 3); // 0.1481847
+            const GPA_TO_BAR = 10000.0;
+            const CM_TO_THZ = 0.0299792458; // السرعة الدقيقة للضوء لتحويل التردد الموجي
+
+            let inputLines = rawInput.split('\n');
+            let outputLines = [];
+
+            for (let i = 0; i < inputLines.length; i++) {
+                let line = inputLines[i].trim();
+                if (line === "") {
+                    outputLines.push(""); // الحفاظ على السطور الفارغة المتروكة عمداً
+                    continue;
+                }
+
+                let val = parseFloat(line);
+                if (isNaN(val)) {
+                    outputLines.push(`[Error: line ${i+1} is non-numeric]`);
+                    continue;
+                }
+
+                let result = 0;
+                // تطبيق التحويل حسب النمط المحدد
+                switch (mode) {
+                    case "ry_ev": result = val * RY_TO_EV; break;
+                    case "ev_ry": result = val / RY_TO_EV; break;
+                    case "bohr_ang": result = val * BOHR_TO_ANG; break;
+                    case "ang_bohr": result = val / BOHR_TO_ANG; break;
+                    case "bo3_ang3": result = val * BOHR3_TO_ANG3; break;
+                    case "ang3_bo3": result = val / BOHR3_TO_ANG3; break;
+                    case "gpa_bar": result = val * GPA_TO_BAR; break;
+                    case "bar_gpa": result = val / GPA_TO_BAR; break;
+                    case "cm_thz": result = val * CM_TO_THZ; break;
+                    case "thz_cm": result = val / CM_TO_THZ; break;
+                }
+
+                // التصدير بدقة 6 أرقام عشرية وهو المعتمد في ملفات wien2k
+                outputLines.push(result.toFixed(6));
+            }
+
+            // طباعة المعطيات المحولة سطراً بسطر
+            outputArea.value = outputLines.join('\n');
+        }
+    </script>
+</body>
+</html>

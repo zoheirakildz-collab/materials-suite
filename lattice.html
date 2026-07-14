@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lattice Parameter Generator</title>
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --glass-card: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-glow: #f8fafc;
+            --text-dim: #94a3b8;
+            --glow-indigo: #6366f1;
+            --glow-cyan: #06b6d4;
+            --glow-emerald: #10b981;
+            --glow-purple: #a855f7;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 95% 90%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+            color: var(--text-glow);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 96%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            width: 100%;
+        }
+
+        .top-nav h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.03em;
+        }
+
+        .top-nav p {
+            color: var(--text-dim);
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--text-dim);
+        }
+
+        .studio-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 1.5rem;
+            width: 100%;
+            align-items: start;
+        }
+
+        .control-stack {
+            flex: 0 0 44%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .visualization-column {
+            flex: 0 0 56%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .glass-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .glass-card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            color: var(--text-glow);
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, input {
+            background-color: rgba(10, 15, 30, 0.5);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.6rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+        }
+
+        .hidden { display: none !important; }
+
+        button {
+            color: white;
+            border: none;
+            padding: 0.7rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .btn-indigo { background: linear-gradient(135deg, var(--glow-indigo), #4f46e5); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15); }
+        .btn-indigo:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3); }
+        
+        .btn-purple { background: linear-gradient(135deg, var(--glow-purple), #9333ea); box-shadow: 0 4px 15px rgba(168, 85, 247, 0.15); }
+        .btn-purple:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3); }
+
+        .btn-sub-solver {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            color: var(--text-dim);
+            padding: 0.45rem 0.9rem;
+            font-size: 0.8rem;
+            border-radius: 8px;
+            width: auto;
+            align-self: flex-end;
+            margin-top: 0.25rem;
+        }
+        .btn-sub-solver:hover {
+            background: rgba(168, 85, 247, 0.1);
+            border-color: var(--glow-purple);
+            color: var(--text-glow);
+        }
+
+        .btn-emerald { background: linear-gradient(135deg, var(--glow-emerald), #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15); }
+        .btn-emerald:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3); }
+
+        .terminal-box {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px dashed var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 0.75rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .terminal-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+        }
+
+        .terminal-line span:last-child {
+            font-weight: 600;
+            color: var(--glow-cyan);
+        }
+
+        .points-container {
+            max-height: 160px;
+            overflow-y: auto;
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 0.75rem;
+            background-color: rgba(0,0,0,0.2);
+            margin-bottom: 0.75rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 0.75rem;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: monospace;
+            font-size: 0.85rem;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background-color: rgba(255, 255, 255, 0.03);
+            color: var(--glow-cyan);
+            font-weight: 600;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        th, td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid var(--glass-border);
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="top-nav">
+            <div>
+                <h1>Lattice Parameter Generator</h1>
+                <p>Isotropic volume expansion vectors and anisotropic ratio strain mesh generator for ab-initio inputs.</p>
+            </div>
+            <a href="index.html" class="back-btn">← Back to Overview</a>
+        </header>
+
+        <section class="studio-layout">
+            
+            <div class="control-stack">
+                
+                <!-- 1. Geometry Setup -->
+                <div class="glass-card">
+                    <h2>1. Initial Geometry Setup</h2>
+                    <div class="form-panel" style="margin-bottom: 0.75rem;">
+                        <label>Crystal System</label>
+                        <select id="crystalSystem" onchange="adaptInputs()">
+                            <option value="cubic">Cubic</option>
+                            <option value="tetragonal" selected>Tetragonal</option>
+                            <option value="hexagonal">Hexagonal</option>
+                            <option value="trigonal">Trigonal / Rhombohedral</option>
+                            <option value="orthorhombic">Orthorhombic</option>
+                            <option value="monoclinic">Monoclinic</option>
+                            <option value="triclinic">Triclinic</option>
+                        </select>
+                    </div>
+
+                    <div class="grid-inputs">
+                        <div class="form-panel">
+                            <label>Initial a (Å)</label>
+                            <input type="number" id="inputA" step="0.00001" value="4.00000">
+                        </div>
+                        <div class="form-panel id-b hidden">
+                            <label>Initial b (Å)</label>
+                            <input type="number" id="inputB" step="0.00001" value="4.10000">
+                        </div>
+                        <div class="form-panel id-c">
+                            <label>Initial c (Å)</label>
+                            <input type="number" id="inputC" step="0.00001" value="6.00000">
+                        </div>
+                    </div>
+
+                    <div class="grid-inputs id-angles hidden">
+                        <div class="form-panel">
+                            <label>&alpha; (deg)</label>
+                            <input type="number" id="inputAlpha" step="0.01" value="90.0">
+                        </div>
+                        <div class="form-panel">
+                            <label>&beta; (deg)</label>
+                            <input type="number" id="inputBeta" step="0.01" value="90.0">
+                        </div>
+                        <div class="form-panel">
+                            <label>&gamma; (deg)</label>
+                            <input type="number" id="inputGamma" step="0.01" value="90.0">
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-indigo" onclick="lockBaseline()">Lock Baseline Parameters</button>
+
+                    <div id="baselineBox" class="terminal-box hidden">
+                        <div class="terminal-line"><span>Calculated Volume (V):</span><span id="lblVolume">--</span></div>
+                        <div class="terminal-line" id="boxCA"><span>c/a Ratio:</span><span id="lblCA">--</span></div>
+                        <div class="terminal-line hidden" id="boxBA"><span>b/a Ratio:</span><span id="lblBA">--</span></div>
+                    </div>
+                </div>
+
+                <!-- 2. Direct Value Solver -->
+                <div class="glass-card id-single-calc hidden">
+                    <h2>2. Direct Value Solver (Single Point)</h2>
+                    <div class="grid-inputs" style="margin-bottom: 0.4rem;">
+                        <div class="form-panel">
+                            <label>Target Parameter</label>
+                            <select id="singleTargetType"></select>
+                        </div>
+                        <div class="form-panel">
+                            <label>Absolute Target</label>
+                            <input type="number" id="singleTargetValue" step="0.00001" placeholder="e.g. 1.45">
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: flex-end; width:100%;">
+                        <button type="button" class="btn-sub-solver" onclick="executeSingleCalculation()">Solve Target</button>
+                    </div>
+
+                    <div id="singleResultBox" class="terminal-box hidden" style="font-size: 0.8rem; padding: 0.8rem;">
+                        <div id="singleResultsRow" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between;">
+                            <span>a: <b id="resSingleA" style="color:var(--glow-purple);">--</b></span>
+                            <span id="resSingleBRow" class="hidden">b: <b id="resSingleB" style="color:var(--glow-purple);">--</b></span>
+                            <span id="resSingleCRow">c: <b id="resSingleC" style="color:var(--glow-purple);">--</b></span>
+                            <span>V: <b id="resSingleV" style="color:var(--glow-cyan);">--</b></span>
+                            <span id="resSingleCARow">c/a: <b id="resSingleCA" style="color:var(--glow-emerald);">--</b></span>
+                            <span id="resSingleBARow" class="hidden">b/a: <b id="resSingleBA" style="color:var(--glow-emerald);">--</b></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Bulk Mesh Matrix Configuration -->
+                <div class="glass-card id-phase2 hidden">
+                    <h2>3. Bulk Mesh Configuration</h2>
+                    <div class="grid-inputs">
+                        <div class="form-panel">
+                            <label>Vector Mode</label>
+                            <select id="optMode"></select>
+                        </div>
+                        <div class="form-panel">
+                            <label>Mesh Points</label>
+                            <input type="number" id="meshPoints" min="1" max="50" value="5" onchange="generateMeshFields()">
+                        </div>
+                    </div>
+                    <label style="display:block; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight:600; color:var(--text-dim);">Shift Percentages (%):</label>
+                    <div id="pointsInputs" class="points-container grid-inputs"></div>
+                    <button type="button" class="btn-indigo" onclick="executeOptimization()">Compute Lattice Matrix</button>
+                </div>
+
+            </div>
+
+            <!-- Right Side Output Mesh Screen -->
+            <div class="visualization-column">
+                <div class="glass-card id-phase3 hidden">
+                    <h2>Generated Calculation Mesh Matrix</h2>
+                    <div class="table-responsive">
+                        <table id="resultsTable">
+                            <thead><tr id="tableHeader"></tr></thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                    <button class="btn-emerald" style="margin-top: 0.75rem;" onclick="exportToTXT()">Export Mesh Matrix (.TXT)</button>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        let v_init, a_init, b_init, c_init, covera_init, bovera_init;
+        let alpha_init, beta_init, gamma_init;
+        let globalResults = [];
+
+        function adaptInputs() {
+            const system = document.getElementById("crystalSystem").value;
+            let isAsymmetric = (system === "orthorhombic" || system === "monoclinic" || system === "triclinic");
+            
+            document.querySelector(".id-b").classList.toggle("hidden", !isAsymmetric);
+            document.querySelector(".id-c").classList.toggle("hidden", system === "cubic");
+            
+            const anglesDiv = document.querySelector(".id-angles");
+            if (system === "triclinic") {
+                anglesDiv.classList.remove("hidden");
+                document.getElementById("inputAlpha").disabled = false;
+                document.getElementById("inputBeta").disabled = false;
+                document.getElementById("inputGamma").disabled = false;
+            } else if (system === "monoclinic") {
+                anglesDiv.classList.remove("hidden");
+                document.getElementById("inputAlpha").value = "90.0";
+                document.getElementById("inputBeta").disabled = false;
+                document.getElementById("inputGamma").value = "90.0";
+            } else if (system === "trigonal") {
+                anglesDiv.classList.remove("hidden");
+                document.getElementById("inputAlpha").disabled = false;
+                document.getElementById("inputBeta").disabled = true;
+                document.getElementById("inputGamma").disabled = true;
+            } else {
+                anglesDiv.classList.add("hidden");
+            }
+
+            document.querySelector(".id-phase2").classList.add("hidden");
+            document.querySelector(".id-phase3").classList.add("hidden");
+            document.querySelector(".id-single-calc").classList.add("hidden");
+            document.getElementById("singleResultBox").classList.add("hidden");
+            document.getElementById("baselineBox").classList.add("hidden");
+        }
+
+        function calculateVolume(a, b, c, alphaDeg, betaDeg, gammaDeg, system) {
+            if (system === "cubic") return Math.pow(a, 3);
+            if (system === "tetragonal") return Math.pow(a, 2) * c;
+            if (system === "hexagonal") return (Math.sqrt(3) / 2) * Math.pow(a, 2) * c;
+            
+            let ar = alphaDeg * Math.PI / 180;
+            let br = betaDeg * Math.PI / 180;
+            let gr = gammaDeg * Math.PI / 180;
+
+            if (system === "trigonal") {
+                let cosA = Math.cos(ar);
+                return Math.pow(a, 3) * Math.sqrt(1 - 3*cosA*cosA + 2*Math.pow(cosA, 3));
+            }
+            if (system === "orthorhombic") return a * b * c;
+            if (system === "monoclinic") return a * b * c * Math.sin(br);
+            if (system === "triclinic") {
+                let cosA = Math.cos(ar), cosB = Math.cos(br), cosG = Math.cos(gr);
+                return a * b * c * Math.sqrt(1 - cosA*cosA - cosB*cosB - cosG*cosG + 2*cosA*cosB*cosG);
+            }
+            return 0;
+        }
+
+        function lockBaseline() {
+            const system = document.getElementById("crystalSystem").value;
+            a_init = parseFloat(document.getElementById("inputA").value);
+            let isAsymmetric = (system === "orthorhombic" || system === "monoclinic" || system === "triclinic");
+            
+            if (system === "cubic") { b_init = a_init; c_init = a_init; }
+            else if (system === "tetragonal" || system === "hexagonal" || system === "trigonal") { b_init = a_init; c_init = parseFloat(document.getElementById("inputC").value); }
+            else { b_init = parseFloat(document.getElementById("inputB").value); c_init = parseFloat(document.getElementById("inputC").value); }
+
+            alpha_init = parseFloat(document.getElementById("inputAlpha").value) || 90.0;
+            beta_init = parseFloat(document.getElementById("inputBeta").value) || 90.0;
+            gamma_init = parseFloat(document.getElementById("inputGamma").value) || 90.0;
+
+            if (system === "trigonal") { beta_init = alpha_init; gamma_init = alpha_init; }
+            if (isNaN(a_init) || isNaN(b_init) || isNaN(c_init)) { alert("Provide valid initial inputs."); return; }
+
+            v_init = calculateVolume(a_init, b_init, c_init, alpha_init, beta_init, gamma_init, system);
+            covera_init = c_init / a_init; 
+            bovera_init = b_init / a_init;
+
+            document.getElementById("lblVolume").innerText = v_init.toFixed(4) + " Å³";
+            document.getElementById("boxCA").classList.toggle("hidden", system === "cubic");
+            document.getElementById("lblCA").innerText = covera_init.toFixed(4);
+            document.getElementById("boxBA").classList.toggle("hidden", !isAsymmetric);
+            document.getElementById("lblBA").innerText = bovera_init.toFixed(4);
+            document.getElementById("baselineBox").classList.remove("hidden");
+
+            const optModeSelect = document.getElementById("optMode");
+            optModeSelect.innerHTML = '<option value="1">Scale Volume (Isotropic)</option>';
+            if (system !== "cubic") {
+                if (isAsymmetric) {
+                    optModeSelect.innerHTML += '<option value="2">Vary c/a Ratio (Constant V & b/a)</option>';
+                    optModeSelect.innerHTML += '<option value="3">Vary b/a Ratio (Constant V & c/a)</option>';
+                } else {
+                    optModeSelect.innerHTML += '<option value="2">Vary c/a Ratio (Constant V)</option>';
+                }
+            }
+
+            const singleTargetSelect = document.getElementById("singleTargetType");
+            singleTargetSelect.innerHTML = '<option value="vol">Target Volume (Å³)</option>';
+            if (system !== "cubic") singleTargetSelect.innerHTML += '<option value="ca">Target c/a Ratio</option>';
+            if (isAsymmetric) singleTargetSelect.innerHTML += '<option value="ba">Target b/a Ratio</option>';
+
+            // تهيئة واجهات الحل المنفرد للمكعبات لمنع تداخل c و c/a
+            document.getElementById("resSingleCRow").classList.toggle("hidden", system === "cubic");
+            document.getElementById("resSingleCARow").classList.toggle("hidden", system === "cubic");
+
+            document.querySelector(".id-phase2").classList.remove("hidden");
+            document.querySelector(".id-single-calc").classList.remove("hidden");
+            generateMeshFields();
+        }
+
+        function executeSingleCalculation() {
+            const system = document.getElementById("crystalSystem").value;
+            const targetType = document.getElementById("singleTargetType").value;
+            const targetVal = parseFloat(document.getElementById("singleTargetValue").value);
+
+            if (isNaN(targetVal) || targetVal <= 0) { alert("Enter a valid target number."); return; }
+            let new_a, new_b, new_c, curr_v;
+
+            if (targetType === "vol") {
+                curr_v = targetVal; 
+                const scale = Math.cbrt(curr_v / v_init);
+                new_a = a_init * scale; new_b = b_init * scale; new_c = c_init * scale;
+            } else if (targetType === "ca") {
+                curr_v = v_init; const new_ca = targetVal;
+                if (system === "tetragonal") { new_a = Math.cbrt(v_init / new_ca); new_b = new_a; new_c = new_a * new_ca; }
+                else if (system === "hexagonal") { new_a = Math.cbrt(v_init / ((Math.sqrt(3)/2) * new_ca)); new_b = new_a; new_c = new_a * new_ca; }
+                else if (system === "trigonal") {
+                    let cosA = Math.cos(alpha_init * Math.PI / 180);
+                    let geom = Math.sqrt(1 - 3*cosA*cosA + 2*Math.pow(cosA, 3));
+                    new_a = Math.cbrt(v_init / geom); new_b = new_a; new_c = new_a * new_ca;
+                }
+                else if (system === "orthorhombic") { new_a = Math.cbrt(v_init / (bovera_init * new_ca)); new_b = new_a * bovera_init; new_c = new_a * new_ca; }
+                else if (system === "monoclinic") { new_a = Math.cbrt(v_init / (bovera_init * new_ca * Math.sin(beta_init * Math.PI / 180))); new_b = new_a * bovera_init; new_c = new_a * new_ca; }
+                else if (system === "triclinic") {
+                    let cosA = Math.cos(alpha_init*Math.PI/180), cosB = Math.cos(beta_init*Math.PI/180), cosG = Math.cos(gamma_init*Math.PI/180);
+                    let geom = Math.sqrt(1 - cosA*cosA - cosB*cosB - cosG*cosG + 2*cosA*cosB*cosG);
+                    new_a = Math.cbrt(v_init / (bovera_init * new_ca * geom)); new_b = new_a * bovera_init; new_c = new_a * new_ca;
+                }
+            } else if (targetType === "ba") {
+                curr_v = v_init; const new_ba = targetVal;
+                if (system === "orthorhombic") { new_a = Math.cbrt(v_init / (new_ba * covera_init)); new_b = new_a * new_ba; new_c = new_a * covera_init; }
+                else if (system === "monoclinic") { new_a = Math.cbrt(v_init / (new_ba * covera_init * Math.sin(beta_init * Math.PI / 180))); new_b = new_a * new_ba; new_c = new_a * covera_init; }
+                else if (system === "triclinic") {
+                    let cosA = Math.cos(alpha_init*Math.PI/180), cosB = Math.cos(beta_init*Math.PI/180), cosG = Math.cos(gamma_init*Math.PI/180);
+                    let geom = Math.sqrt(1 - cosA*cosA - cosB*cosB - cosG*cosG + 2*cosA*cosB*cosG);
+                    new_a = Math.cbrt(v_init / (new_ba * covera_init * geom)); new_b = new_a * new_ba; new_c = new_a * covera_init;
+                }
+            }
+
+            document.getElementById("resSingleA").innerText = new_a.toFixed(5) + " Å";
+            document.getElementById("resSingleBRow").classList.toggle("hidden", system !== "orthorhombic" && system !== "monoclinic" && system !== "triclinic");
+            document.getElementById("resSingleB").innerText = new_b.toFixed(5) + " Å";
+            document.getElementById("resSingleC").innerText = new_c.toFixed(5) + " Å";
+            document.getElementById("resSingleV").innerText = curr_v.toFixed(3) + " Å³";
+            document.getElementById("resSingleCA").innerText = (new_c/new_a).toFixed(4);
+            
+            const singleBA = document.getElementById("resSingleBA");
+            document.getElementById("resSingleBARow").classList.toggle("toggle", system !== "orthorhombic" && system !== "monoclinic" && system !== "triclinic");
+            if (system === "orthorhombic" || system === "monoclinic" || system === "triclinic") singleBA.innerText = (new_b/new_a).toFixed(4);
+
+            document.getElementById("singleResultBox").classList.remove("hidden");
+        }
+
+        function generateMeshFields() {
+            const pts = parseInt(document.getElementById("meshPoints").value) || 0;
+            const container = document.getElementById("pointsInputs");
+            container.innerHTML = "";
+            for (let i = 1; i <= pts; i++) {
+                container.innerHTML += `
+                    <div class="form-panel">
+                        <label>Pt ${i} (%)</label>
+                        <input type="number" class="mesh-pct-input" step="0.1" value="${(i * 0.5 - (pts*0.25)).toFixed(1)}">
+                    </div>`;
+            }
+            document.querySelector(".id-phase3").classList.add("hidden");
+        }
+
+        function executeOptimization() {
+            const system = document.getElementById("crystalSystem").value;
+            const mode = document.getElementById("optMode").value;
+            const fields = document.querySelectorAll(".mesh-pct-input");
+            globalResults = [];
+            
+            let isFullLat = (system === "orthorhombic" || system === "monoclinic" || system === "triclinic");
+
+            // عزل رؤوس الجدول ديناميكياً للمكعبات (Cubic) لمنع ظهور أعمدة c و c/a
+            let htmlHeader = `<th>Pt</th><th>Shift %</th><th>a (Å)</th>`;
+            if (isFullLat) htmlHeader += `<th>b (Å)</th>`;
+            if (system !== "cubic") htmlHeader += `<th>c (Å)</th>`;
+            htmlHeader += `<th>Volume (Å³)</th>`;
+            if (system !== "cubic") htmlHeader += `<th>c/a</th>`;
+            if (isFullLat) htmlHeader += `<th>b/a</th>`;
+            document.getElementById("tableHeader").innerHTML = htmlHeader;
+
+            let htmlBody = "";
+            fields.forEach((field, index) => {
+                const pct = parseFloat(field.value) || 0; 
+                const factor = 1 + (pct / 100);
+                let new_a, new_b, new_c, curr_v;
+
+                if (mode === "1") {
+                    curr_v = v_init * factor; 
+                    const scale = Math.cbrt(curr_v / v_init);
+                    new_a = a_init * scale; new_b = b_init * scale; new_c = c_init * scale;
+                } else if (mode === "2") {
+                    const new_ca = covera_init * factor; curr_v = v_init;
+                    if (system === "tetragonal") { new_a = Math.cbrt(v_init / new_ca); new_b = new_a; new_c = new_a * new_ca; }
+                    else if (system === "hexagonal") { new_a = Math.cbrt(v_init / ((Math.sqrt(3)/2) * new_ca)); new_b = new_a; new_c = new_a * new_ca; }
+                    else if (system === "trigonal") {
+                        let cosA = Math.cos(alpha_init * Math.PI / 180);
+                        let geom = Math.sqrt(1 - 3*cosA*cosA + 2*Math.pow(cosA, 3));
+                        new_a = Math.cbrt(v_init / geom); new_b = new_a; new_c = new_a * new_ca;
+                    }
+                    else if (system === "orthorhombic") { new_a = Math.cbrt(v_init / (bovera_init * new_ca)); new_b = new_a * bovera_init; new_c = new_a * new_ca; }
+                    else if (system === "monoclinic") { new_a = Math.cbrt(v_init / (bovera_init * new_ca * Math.sin(beta_init * Math.PI / 180))); new_b = new_a * bovera_init; new_c = new_a * new_ca; }
+                    else if (system === "triclinic") {
+                        let cosA = Math.cos(alpha_init*Math.PI/180), cosB = Math.cos(beta_init*Math.PI/180), cosG = Math.cos(gamma_init*Math.PI/180);
+                        let geom = Math.sqrt(1 - cosA*cosA - cosB*cosB - cosG*cosG + 2*cosA*cosB*cosG);
+                        new_a = Math.cbrt(v_init / (bovera_init * new_ca * geom)); new_b = new_a * bovera_init; new_c = new_a * new_ca;
+                    }
+                } else if (mode === "3" && isFullLat) {
+                    const new_ba = bovera_init * factor; curr_v = v_init;
+                    if (system === "orthorhombic") { new_a = Math.cbrt(v_init / (new_ba * covera_init)); new_b = new_a * new_ba; new_c = new_a * covera_init; }
+                    else if (system === "monoclinic") { new_a = Math.cbrt(v_init / (new_ba * covera_init * Math.sin(beta_init * Math.PI / 180))); new_b = new_a * new_ba; new_c = new_a * covera_init; }
+                    else if (system === "triclinic") {
+                        let cosA = Math.cos(alpha_init*Math.PI/180), cosB = Math.cos(beta_init*Math.PI/180), cosG = Math.cos(gamma_init*Math.PI/180);
+                        let geom = Math.sqrt(1 - cosA*cosA - cosB*cosB - cosG*cosG + 2*cosA*cosB*cosG);
+                        new_a = Math.cbrt(v_init / (new_ba * covera_init * geom)); new_b = new_a * new_ba; new_c = new_a * covera_init;
+                    }
+                }
+
+                globalResults.push({ pt: index + 1, pct, a: new_a, b: new_b, c: new_c, v: curr_v, ca: new_c/new_a, ba: new_b/new_a });
+                
+                // عزل الأسطر البرمجية ديناميكياً للمكعبات لمنع تداخل الخلايا
+                let rowHtml = `<tr><td>${index+1}</td><td>${pct>0?'+'+pct:pct}%</td><td>${new_a.toFixed(5)}</td>`;
+                if (isFullLat) rowHtml += `<td>${new_b.toFixed(5)}</td>`;
+                if (system !== "cubic") rowHtml += `<td>${new_c.toFixed(5)}</td>`;
+                rowHtml += `<td>${curr_v.toFixed(3)}</td>`;
+                if (system !== "cubic") rowHtml += `<td>${(new_c/new_a).toFixed(4)}</td>`;
+                if (isFullLat) rowHtml += `<td>${(new_b/new_a).toFixed(4)}</td>`;
+                rowHtml += `</tr>`;
+                htmlBody += rowHtml;
+            });
+
+            document.getElementById("tableBody").innerHTML = htmlBody;
+            document.querySelector(".id-phase3").classList.remove("hidden");
+        }
+
+        function exportToTXT() {
+            const system = document.getElementById("crystalSystem").value;
+            let isFullLat = (system === "orthorhombic" || system === "monoclinic" || system === "triclinic");
+            let txtContent = "";
+            
+            // عزل ترويسة الملف النصي المنسق بناءً على نوع النظام لمنع التكرار
+            let headers = `Pt\tShift%\ta(Å)\t`;
+            if (isFullLat) headers += `b(Å)\t`;
+            if (system !== "cubic") headers += `c(Å)\t`;
+            headers += `Vol(Å³)`;
+            if (system !== "cubic") headers += `\tRatio`;
+            if (isFullLat) headers += `\tb/a`;
+            headers += `\n`;
+            
+            txtContent += headers + "-------------------------------------------------------------------------\n";
+
+            globalResults.forEach(r => {
+                let row = `${r.pt}\t${r.pct > 0 ? '+' + r.pct : r.pct}%\t${r.a.toFixed(6)}`;
+                if (isFullLat) row += `\t${r.b.toFixed(6)}`;
+                if (system !== "cubic") row += `\t${r.c.toFixed(6)}`;
+                row += `\t${r.v.toFixed(4)}`;
+                if (system !== "cubic") row += `\t${r.ca.toFixed(4)}`;
+                if (isFullLat) row += `\t${r.ba.toFixed(4)}`;
+                txtContent += row + "\n";
+            });
+
+            const blob = new Blob([txtContent], { type: "text/plain;charset=utf-8" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", `lattice_matrix_output.txt`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

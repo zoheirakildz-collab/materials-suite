@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structural Phase & Ratio Processor</title>
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --glass-card: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-glow: #f8fafc;
+            --text-dim: #94a3b8;
+            --glow-indigo: #6366f1;
+            --glow-cyan: #06b6d4;
+            --glow-emerald: #10b981;
+            --glow-purple: #a855f7;
+            --glow-amber: #fbbf24;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 95% 90%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+            color: var(--text-glow);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 96%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            width: 100%;
+        }
+
+        .top-nav h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.03em;
+        }
+
+        .top-nav p {
+            color: var(--text-dim);
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--text-dim);
+        }
+
+        .studio-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 1.5rem;
+            width: 100%;
+            align-items: start;
+        }
+
+        .control-stack {
+            flex: 0 0 44%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .visualization-column {
+            flex: 0 0 56%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .glass-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .glass-card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            color: var(--text-glow);
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, textarea {
+            background-color: rgba(10, 15, 30, 0.5);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.6rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        select:focus, textarea:focus {
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+        }
+
+        .hidden { display: none !important; }
+
+        button {
+            color: white;
+            border: none;
+            padding: 0.7rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .btn-purple { background: linear-gradient(135deg, var(--glow-purple), #9333ea); box-shadow: 0 4px 15px rgba(168, 85, 247, 0.15); }
+        .btn-purple:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3); }
+
+        .btn-amber { background: linear-gradient(135deg, var(--glow-amber), #d97706); box-shadow: 0 4px 15px rgba(251, 191, 36, 0.15); }
+        .btn-amber:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(251, 191, 36, 0.3); }
+
+        .terminal-box {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px dashed var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 0.75rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .terminal-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+        }
+
+        .terminal-line span:last-child {
+            font-weight: 600;
+            color: var(--glow-cyan);
+        }
+
+        textarea {
+            width: 100%;
+            height: 110px;
+            resize: none;
+            box-sizing: border-box;
+            font-family: monospace;
+        }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="top-nav">
+            <div>
+                <h1>Structural Phase & Ratio Processor</h1>
+                <p>Fit Birch-Murnaghan energy-volume state equations and calculate anisotropic ratio polynomial regressions.</p>
+            </div>
+            <a href="index.html" class="back-btn">← Back to Overview</a>
+        </header>
+
+        <section class="studio-layout">
+            
+            <div class="control-stack">
+                
+                <!-- Box 1: Birch-Murnaghan EOS Engine -->
+                <div class="glass-card">
+                    <h2>1. Birch-Murnaghan EOS Engine (Isotropic V)</h2>
+                    <div class="form-panel" style="margin-bottom: 0.75rem;">
+                        <label>Paste Volume-Energy Arrays (V_Bohr³ E_Ry)</label>
+                        <textarea id="eosRawData" placeholder="680.25  -80238.0125&#10;692.61  -80238.0914&#10;705.12  -80238.0341"></textarea>
+                    </div>
+                    <button type="button" class="btn-purple" onclick="solveEOS()">Solve Isotropic EOS Fit</button>
+
+                    <div id="eosResultBox" class="terminal-box hidden">
+                        <div class="terminal-line"><span>Minimum Energy (E₀):</span><span id="resE0">--</span></div>
+                        <div class="terminal-line"><span>Equilibrium Vol (V₀):</span><span id="resV0">--</span></div>
+                        <div class="terminal-line"><span>Bulk Modulus (B₀):</span><span id="resB0">--</span></div>
+                        <div class="terminal-line"><span>Derivative (B'):</span><span id="resBPrime">--</span></div>
+                    </div>
+                </div>
+
+                <!-- Box 2: Anisotropic Axial Ratio Fitting Engine -->
+                <div class="glass-card">
+                    <h2>2. Axis Ratio Solver (Polynomial Regression)</h2>
+                    <div class="grid-inputs">
+                        <div class="form-panel">
+                            <label>Parameter Type</label>
+                            <select id="ratioType">
+                                <option value="ratio" selected>Lattice Strain Ratio</option>
+                            </select>
+                        </div>
+                        <div class="form-panel">
+                            <label>Polynomial Degree</label>
+                            <select id="polyDegree">
+                                <option value="2">2nd Degree (Quadratic)</option>
+                                <option value="3">3rd Degree (Cubic)</option>
+                                <option value="4" selected>4th Degree (Quartic)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-panel" style="margin-bottom: 0.75rem;">
+                        <label>Paste Ratio-Energy Arrays (Ratio Energy_Ry)</label>
+                        <textarea id="ratioRawData" placeholder="1.40  -80238.0215&#10;1.45  -80238.0954&#10;1.50  -80238.0412"></textarea>
+                    </div>
+                    <button type="button" class="btn-amber" onclick="solveRatioFit()">Solve Polynomial Regression</button>
+
+                    <div id="ratioResultBox" class="terminal-box hidden">
+                        <div class="terminal-line"><span>Optimal Ratio Limit:</span><span id="resOptimalRatio">--</span></div>
+                        <div class="terminal-line"><span>Minimum Stable Energy:</span><span id="resRatioMinE">--</span></div>
+                        <div class="terminal-line"><span>Fitting Polynomial Expression:</span><span id="resPolyEq" style="color:var(--glow-amber) !important; font-size:0.75rem;">--</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="visualization-column">
+                
+                <div class="glass-card id-chart-eos hidden" style="min-height: 410px;">
+                    <div id="eosPlot" style="width:100%; height:370px;"></div>
+                </div>
+
+                <div class="glass-card id-chart-ratio hidden" style="min-height: 410px;">
+                    <div id="ratioPlot" style="width:100%; height:370px;"></div>
+                </div>
+                
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        // Module 1: Birch-Murnaghan Solver Engine
+        function solveEOS() {
+            const rawText = document.getElementById("eosRawData").value.trim();
+            if(!rawText) { alert("Enter volume energy steps data points."); return; }
+            let V_data = [], E_data = [];
+            rawText.split('\n').forEach(line => {
+                const parts = line.trim().split(/\s+/);
+                if(parts.length >= 2) { V_data.push(parseFloat(parts[0])); E_data.push(parseFloat(parts[1])); }
+            });
+            
+            if(V_data.length < 3) { alert("Requires at least 3 data points."); return; }
+
+            let minE = Math.min(...E_data);
+            let approx_V0 = V_data[E_data.indexOf(minE)];
+            
+            let v_min = approx_V0 * 0.95, v_max = approx_V0 * 1.05;
+            let b_min = 10.0, b_max = 300.0;
+            
+            // في حال كانت النقاط 3 فقط، يتم تثبيت مشتقة الضغط عند القيمة المرجعية 5.0 بدقة
+            let isThreePoints = (V_data.length === 3);
+            let bp_min = isThreePoints ? 5.0 : 1.0;
+            let bp_max = isThreePoints ? 5.0 : 10.0;
+
+            let best_V0 = approx_V0, best_E0 = minE, best_B = 100.0, best_BP = 5.0;
+            
+            let stages = 5; 
+            for (let stage = 0; stage < stages; stage++) {
+                let min_residual = Infinity;
+                let current_best_V0 = best_V0; let current_best_B = best_B; let current_best_BP = best_BP; let current_best_E0 = best_E0;
+                let v_steps = 40, b_steps = 40, bp_steps = isThreePoints ? 0 : 25;
+
+                for (let i = 0; i <= v_steps; i++) {
+                    let v0 = v_min + (i / v_steps) * (v_max - v_min);
+                    for (let j = 0; j <= b_steps; j++) {
+                        let b = b_min + (j / b_steps) * (b_max - b_min);
+                        for (let k = 0; k <= bp_steps; k++) {
+                            let bp = isThreePoints ? 5.0 : (bp_min + (k / bp_steps) * (bp_max - bp_min));
+                            
+                            let e0_calc = 0;
+                            V_data.forEach((v, idx) => {
+                                let eta = Math.pow(v0 / v, 1/3); let eta2 = eta * eta;
+                                let term = (9/16) * (b / 14703.6) * v0 * (Math.pow(eta2 - 1, 3) * bp + Math.pow(eta2 - 1, 2) * (6 - 4 * eta2));
+                                e0_calc += (E_data[idx] - term);
+                            });
+                            e0_calc /= V_data.length;
+
+                            let residual = 0;
+                            V_data.forEach((v, idx) => {
+                                let eta = Math.pow(v0 / v, 1/3); let eta2 = eta * eta;
+                                let model_E = e0_calc + (9/16) * (b / 14703.6) * v0 * (Math.pow(eta2 - 1, 3) * bp + Math.pow(eta2 - 1, 2) * (6 - 4 * eta2));
+                                residual += Math.pow(E_data[idx] - model_E, 2);
+                            });
+
+                            if (residual < min_residual) {
+                                min_residual = residual; current_best_V0 = v0; current_best_E0 = e0_calc; current_best_B = b; current_best_BP = bp;
+                            }
+                        }
+                    }
+                }
+                best_V0 = current_best_V0; best_E0 = current_best_E0; best_B = current_best_B; best_BP = current_best_BP;
+                let v_range = (v_max - v_min) * 0.15; v_min = best_V0 - v_range / 2; v_max = best_V0 + v_range / 2;
+                let b_range = (b_max - b_min) * 0.15; b_min = best_B - b_range / 2; b_max = best_B + b_range / 2;
+                if (!isThreePoints) {
+                    let bp_range = (bp_max - bp_min) * 0.15; bp_min = best_BP - bp_range / 2; bp_max = best_BP + bp_range / 2;
+                }
+            }
+
+            document.getElementById("resE0").innerText = best_E0.toFixed(6) + " Ry";
+            document.getElementById("resV0").innerText = best_V0.toFixed(4) + " Bohr³";
+            document.getElementById("resB0").innerText = best_B.toFixed(4) + " GPa";
+            document.getElementById("resBPrime").innerText = best_BP.toFixed(4);
+            
+            document.getElementById("eosResultBox").classList.remove("hidden");
+            document.querySelector(".id-chart-eos").classList.remove("hidden");
+
+            let fitV = [], fitE = [];
+            let displayMinV = Math.min(...V_data) * 0.99; let displayMaxV = Math.max(...V_data) * 1.01;
+            for(let v = displayMinV; v <= displayMaxV; v += (displayMaxV - displayMinV)/100) {
+                fitV.push(v);
+                let eta = Math.pow(best_V0 / v, 1/3); let eta2 = eta * eta;
+                fitE.push(best_E0 + (9/16) * (best_B / 14703.6) * best_V0 * (Math.pow(eta2 - 1, 3) * best_BP + Math.pow(eta2 - 1, 2) * (6 - 4 * eta2)));
+            }
+
+            let dataTrace = { x: V_data, y: E_data, mode: 'markers', name: 'DFT Data', marker: { color: '#06b6d4', size: 10, line: { color: '#ffffff', width: 1.5 } } };
+            let fitTrace = { x: fitV, y: fitE, mode: 'lines', name: 'Birch-Murnaghan Fit', line: { color: '#6366f1', width: 3 } };
+            let layout = {
+                paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', margin: { t: 35, b: 40, l: 120, r: 20 },
+                xaxis: { title: 'Volume V (Bohr³)', color: '#94a3b8', gridcolor: 'rgba(255,255,255,0.05)', zeroline: false },
+                yaxis: { title: { text: 'Total Energy E (Ry)', standoff: 20 }, color: '#94a3b8', gridcolor: 'rgba(255,255,255,0.05)', zeroline: false, tickformat: '.5f', automargin: true },
+                legend: { font: { color: '#94a3b8' }, orientation: 'h', y: -0.2 }
+            };
+            Plotly.newPlot('eosPlot', [dataTrace, fitTrace], layout, {responsive: true});
+        }
+
+        // Module 2: Generalized Polynomial Least-Squares Solver Engine
+        function solveRatioFit() {
+            const rawText = document.getElementById("ratioRawData").value.trim();
+            const degree = parseInt(document.getElementById("polyDegree").value);
+            if(!rawText) { alert("Enter ratio vs energy coordinates."); return; }
+            
+            let X = [], Y = [];
+            rawText.split('\n').forEach(line => {
+                const parts = line.trim().split(/\s+/);
+                if(parts.length >= 2) { X.push(parseFloat(parts[0])); Y.push(parseFloat(parts[1])); }
+            });
+            
+            if(X.length <= degree) { alert(`Requires at least ${degree + 1} points for a degree ${degree} fit.`); return; }
+
+            let order = degree + 1;
+            let A_mat = [];
+            let B_vec = [];
+
+            for (let row = 0; order > row; row++) {
+                let r_row = [];
+                for (let col = 0; order > col; col++) {
+                    let sumX = 0;
+                    X.forEach(x => sumX += Math.pow(x, row + col));
+                    r_row.push(sumX);
+                }
+                A_mat.push(r_row);
+
+                let sumY = 0;
+                X.forEach((x, idx) => sumY += Y[idx] * Math.pow(x, row));
+                B_vec.push([sumY]);
+            }
+
+            let coeffs = math.lusolve(A_mat, B_vec).map(c => c[0]);
+
+            function evalPoly(x) {
+                let y = 0;
+                coeffs.forEach((c, idx) => y += c * Math.pow(x, idx));
+                return y;
+            }
+
+            let optRatio = X[0];
+            let minEnergy = Infinity;
+            let xMin = Math.min(...X), xMax = Math.max(...X);
+            
+            for (let r = xMin; r <= xMax; r += (xMax - xMin)/2000) {
+                let e = evalPoly(r);
+                if (e < minEnergy) { minEnergy = e; optRatio = r; }
+            }
+
+            let eqText = "E = ";
+            coeffs.slice().reverse().forEach((c, idx) => {
+                let p = coeffs.length - 1 - idx;
+                if(p > 0) eqText += `(${c.toExponential(3)})·R${p === 1 ? '' : '^' + p} + `;
+                else eqText += `(${c.toFixed(4)})`;
+            });
+
+            document.getElementById("resOptimalRatio").innerText = optRatio.toFixed(5);
+            document.getElementById("resRatioMinE").innerText = minEnergy.toFixed(6) + " Ry";
+            document.getElementById("resPolyEq").innerText = eqText;
+            
+            document.getElementById("ratioResultBox").classList.remove("hidden");
+            document.querySelector(".id-chart-ratio").classList.remove("hidden");
+
+            let fitX = [], fitY = [];
+            let displayMinX = xMin * 0.99, displayMaxX = xMax * 1.01;
+            for(let r = displayMinX; r <= displayMaxX; r += (displayMaxX - displayMinX)/100) {
+                fitX.push(r); fitY.push(evalPoly(r));
+            }
+
+            let dataTrace = { x: X, y: Y, mode: 'markers', name: 'DFT Data Steps', marker: { color: '#fbbf24', size: 10, line: { color: '#ffffff', width: 1.5 } } };
+            let fitTrace = { x: fitX, y: fitY, mode: 'lines', name: `Degree ${degree} Polynomial Fit`, line: { color: '#a855f7', width: 3 } };
+            let optTrace = { x: [optRatio], y: [minEnergy], mode: 'markers', name: 'Optimal Ratio', marker: { color: '#10b981', size: 13, symbol: 'star' } };
+            
+            let layout = {
+                paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', margin: { t: 30, b: 40, l: 120, r: 20 },
+                xaxis: { title: 'Lattice Axial Ratio Parameter', color: '#94a3b8', gridcolor: 'rgba(255,255,255,0.05)', zeroline: false },
+                yaxis: { title: { text: 'Total Energy E (Ry)', standoff: 20 }, color: '#94a3b8', gridcolor: 'rgba(255,255,255,0.05)', zeroline: false, tickformat: '.5f', automargin: true },
+                legend: { font: { color: '#94a3b8' }, orientation: 'h', y: -0.2 }
+            };
+            Plotly.newPlot('ratioPlot', [dataTrace, fitTrace, optTrace], layout, {responsive: true});
+        }
+    </script>
+</body>
+</html>

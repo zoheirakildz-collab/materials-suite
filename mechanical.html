@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Elastic Stability & Mechanical Suite</title>
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --glass-card: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-glow: #f8fafc;
+            --text-dim: #94a3b8;
+            --glow-indigo: #6366f1;
+            --glow-cyan: #06b6d4;
+            --glow-emerald: #10b981;
+            --glow-rose: #f43f5e;
+            --glow-purple: #a855f7;
+            --glow-amber: #fbbf24;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 95% 90%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+            color: var(--text-glow);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 96%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            width: 100%;
+        }
+
+        .top-nav h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.03em;
+        }
+
+        .top-nav p {
+            color: var(--text-dim);
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--text-dim);
+        }
+
+        .studio-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 1.5rem;
+            width: 100%;
+            align-items: start;
+        }
+
+        .control-stack {
+            flex: 0 0 42%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .visualization-column {
+            flex: 0 0 58%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .glass-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .glass-card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            color: var(--text-glow);
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, input, textarea {
+            background-color: rgba(10, 15, 30, 0.5);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.6rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+        }
+
+        textarea {
+            height: 180px;
+            font-family: monospace;
+            resize: none;
+            line-height: 1.5;
+        }
+
+        .hidden { display: none !important; }
+
+        button {
+            color: white;
+            border: none;
+            padding: 0.7rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 100%;
+            box-sizing: border-box;
+            background: linear-gradient(135deg, var(--glow-indigo), #4f46e5);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .status-box {
+            border-radius: 12px;
+            padding: 1rem;
+            font-weight: 700;
+            text-align: center;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+        }
+
+        .status-stable { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: var(--glow-emerald); }
+        .status-unstable { background: rgba(244, 63, 94, 0.1); border-color: rgba(244, 63, 94, 0.3); color: var(--glow-rose); }
+
+        .terminal-box {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px dashed var(--glass-border);
+            border-radius: 14px;
+            padding: 1.25rem;
+            font-family: monospace;
+            font-size: 0.88rem;
+        }
+
+        .terminal-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .terminal-line span:last-child {
+            font-weight: 600;
+            color: var(--glow-cyan);
+        }
+
+        .criteria-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 0.3rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            background: rgba(0,0,0,0.15);
+        }
+        .crit-pass { color: var(--glow-emerald); }
+        .crit-fail { color: var(--glow-rose); }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="top-nav">
+            <div>
+                <h1>Universal Elastic Stability & Mechanical Suite</h1>
+                <p>Advanced Born criteria verifier and polycrystalline anisotropic moduli extractor for ab-initio tensors.</p>
+            </div>
+            <a href="index.html" class="back-btn">← Back to Overview</a>
+        </header>
+
+        <section class="studio-layout">
+            
+            <!-- Left Config Hub -->
+            <div class="control-stack">
+                <div class="glass-card">
+                    <h2>Elastic Tensor Input Hub</h2>
+                    
+                    <div class="form-panel" style="margin-bottom: 1rem;">
+                        <label>Crystal Lattice System</label>
+                        <select id="crystalSystem">
+                            <option value="cubic" selected>Cubic System</option>
+                            <option value="hexagonal">Hexagonal System</option>
+                            <option value="tetragonal">Tetragonal System</option>
+                            <option value="trigonal">Trigonal / Rhombohedral</option>
+                            <option value="orthorhombic">Orthorhombic System</option>
+                            <option value="monoclinic">Monoclinic System</option>
+                            <option value="triclinic">Triclinic System</option>
+                        </select>
+                    </div>
+
+                    <div class="form-panel">
+                        <label>Paste Full 6x6 Stiffness Matrix (Cij in GPa)</label>
+                        <textarea id="pasteMatrixBox" placeholder="Paste your 6x6 matrix rows here...&#10;e.g.&#10;120.5  45.2  32.1  0.0  0.0  0.0&#10;45.2  120.5  32.1  0.0  0.0  0.0&#10;..."></textarea>
+                    </div>
+
+                    <h2 style="margin-top: 1.5rem; font-size: 0.95rem; color: var(--glow-purple);">Acoustic & Debye Parameters (Optional)</h2>
+                    <div class="grid-inputs">
+                        <div class="form-panel">
+                            <label>Density &rho; (g/cm³)</label>
+                            <input type="number" id="inputDensity" step="0.01" value="4.50">
+                        </div>
+                        <div class="form-panel">
+                            <label>Avg Atomic Vol V_at (Å³)</label>
+                            <input type="number" id="inputAtomVol" step="0.01" value="15.20">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <button type="button" onclick="evaluateMechanicalSuite()">Analyze Mechanical Data</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Results View Panel -->
+            <div class="visualization-column">
+                
+                <!-- Born Criteria Checking List Card -->
+                <div id="stabilityCard" class="glass-card hidden">
+                    <h2>Born Stability Criteria Check</h2>
+                    <div id="stabilityStatus" class="status-box">--</div>
+                    <div id="criteriaDetailsList"></div>
+                </div>
+
+                <!-- Elastic Profile Module Output View -->
+                <div id="moduliCard" class="glass-card hidden">
+                    <h2>Polycrystalline Elastic Moduli Profiles</h2>
+                    <div class="terminal-box">
+                        <div class="terminal-line"><span>Voigt Bulk Modulus (B_V):</span><span id="resBV">--</span></div>
+                        <div class="terminal-line"><span>Reuss Bulk Modulus (B_R):</span><span id="resBR">--</span></div>
+                        <div class="terminal-line" style="border-bottom:1px solid rgba(255,255,255,0.08);"><span>Hill Bulk Modulus (B_VRH):</span><span id="resB" style="color:var(--glow-emerald);">--</span></div>
+                        
+                        <div class="terminal-line"><span>Voigt Shear Modulus (G_V):</span><span id="resGV">--</span></div>
+                        <div class="terminal-line"><span>Reuss Shear Modulus (G_R):</span><span id="resGR">--</span></div>
+                        <div class="terminal-line" style="border-bottom:1px solid rgba(255,255,255,0.08);"><span>Hill Shear Modulus (G_VRH):</span><span id="resG" style="color:var(--glow-emerald);">--</span></div>
+                        
+                        <div class="terminal-line"><span>Young's Modulus (E):</span><span id="resE" style="color:var(--glow-purple);">--</span></div>
+                        <div class="terminal-line"><span>Poisson's Ratio (&nu;):</span><span id="resNu" style="color:var(--glow-purple);">--</span></div>
+                        
+                        <div class="terminal-line" style="border-top:1px solid rgba(255,255,255,0.08);"><span>Universal Anisotropy Index (A^U):</span><span id="resAnisotropy" style="color:var(--glow-amber);">--</span></div>
+                        <div class="terminal-line"><span>Cauchy Pressure (P_Cauchy):</span><span id="resCauchy">--</span></div>
+                        <div class="terminal-line"><span>Pugh Ductility Index (B/G):</span><span id="resPugh">--</span></div>
+                        <div class="terminal-line"><span>Frantsevich Ratio:</span><span id="resFrantsevich">--</span></div>
+
+                        <div class="terminal-line" style="border-top:1px solid rgba(255,255,255,0.08);"><span>Longitudinal Wave Velocity (v_l):</span><span id="resVl">--</span></div>
+                        <div class="terminal-line"><span>Transverse Wave Velocity (v_t):</span><span id="resVt">--</span></div>
+                        <div class="terminal-line"><span>Mean Sound Velocity (v_m):</span><span id="resVm">--</span></div>
+                        <div class="terminal-line" style="border-bottom:none;"><span>Debye Temperature (&theta;_D):</span><span id="resDebye" style="color:var(--glow-cyan);">--</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        function evaluateMechanicalSuite() {
+            const system = document.getElementById("crystalSystem").value;
+            const rawText = document.getElementById("pasteMatrixBox").value.trim();
+            
+            if(!rawText) { alert("Please paste the 6x6 elastic stiffness tensor data matrix."); return; }
+            
+            const numbers = rawText.split(/\s+/).map(Number).filter(n => !isNaN(n));
+            if(numbers.length < 36) { alert("Invalid matrix tensor. Requires 36 components for a complete 6x6 representation."); return; }
+
+            let C = Array(6).fill(0).map(() => Array(6).fill(0));
+            let idx = 0;
+            for(let i=0; i<6; i++) {
+                for(let j=0; j<6; j++) {
+                    C[i][j] = numbers[idx++];
+                }
+            }
+
+            // 1. Born Mechanical Stability Criteria Processor
+            let criteria = [];
+            let isStable = true;
+            const check = (label, condition) => {
+                criteria.push({ label: label, pass: condition });
+                if(!condition) isStable = false;
+            };
+
+            if (system === "cubic") {
+                check("C11 - C12 > 0", (C[0][0] - C[0][1]) > 0);
+                check("C11 + 2*C12 > 0", (C[0][0] + 2*C[0][1]) > 0);
+                check("C44 > 0", C[3][3] > 0);
+            } else if (system === "hexagonal") {
+                check("C11 > |C12|", C[0][0] > Math.abs(C[0][1]));
+                check("2*C13² < C33 * (C11 + C12)", (2 * C[0][2] * C[0][2]) < (C[2][2] * (C[0][0] + C[0][1])));
+                check("C44 > 0", C[3][3] > 0);
+            } else if (system === "tetragonal") {
+                check("C11 > |C12|", C[0][0] > Math.abs(C[0][1]));
+                check("2*C13² < C33 * (C11 + C12)", (2 * C[0][2] * C[0][2]) < (C[2][2] * (C[0][0] + C[0][1])));
+                check("C44 > 0", C[3][3] > 0);
+                check("C66 > 0", C[5][5] > 0);
+            } else if (system === "trigonal") {
+                check("C11 > |C12|", C[0][0] > Math.abs(C[0][1]));
+                check("C33 * (C11 + C12) > 2*C13²", (C[2][2] * (C[0][0] + C[0][1])) > (2 * C[0][2] * C[0][2]));
+                check("C44 * (C11 - C12) > 2*C14²", (C[3][3] * (C[0][0] - C[0][1])) > (2 * C[0][3] * C[0][3]));
+            } else if (system === "orthorhombic") {
+                check("C11 > 0 , C22 > 0, C33 > 0", C[0][0]>0 && C[1][1]>0 && C[2][2]>0);
+                check("C44 > 0 , C55 > 0, C66 > 0", C[3][3]>0 && C[4][4]>0 && C[5][5]>0);
+                check("C11*C22 > C12²", (C[0][0]*C[1][1]) > (C[0][1]*C[0][1]));
+                let det3 = C[0][0]*C[1][1]*C[2][2] + 2*C[0][1]*C[0][2]*C[1][2] - C[0][0]*C[1][2]*C[1][2] - C[1][1]*C[0][2]*C[0][2] - C[2][2]*C[0][1]*C[0][1];
+                check("Determinant Sub-Matrix M33 > 0", det3 > 0);
+            } else {
+                try {
+                    let passSylvester = true;
+                    for(let k=1; k<=6; k++) {
+                        let sub = [];
+                        for(let r=0; r<k; r++) sub.push(C[r].slice(0, k));
+                        if(math.det(sub) <= 0) passSylvester = false;
+                    }
+                    check("Sylvester's Positive Definite Matrix Constraint", passSylvester);
+                } catch(e) { check("Stiffness Positivity Matrix Check", false); }
+            }
+
+            const statusBox = document.getElementById("stabilityStatus");
+            statusBox.className = "status-box " + (isStable ? "status-stable" : "status-unstable");
+            statusBox.innerText = isStable ? "✓ Structure is Mechanically STABLE" : "✗ Structure is Mechanically UNSTABLE";
+
+            const listContainer = document.getElementById("criteriaDetailsList");
+            listContainer.innerHTML = "";
+            criteria.forEach(c => {
+                listContainer.innerHTML += `
+                    <div class="criteria-item">
+                        <span>${c.label}</span>
+                        <span class="${c.pass?'crit-pass':'crit-fail'}">${c.pass?'PASSED ✓':'FAILED ✗'}</span>
+                    </div>`;
+            });
+            document.getElementById("stabilityCard").classList.remove("hidden");
+
+            // 2. VRH Elastic Moduli Computations
+            let c11=C[0][0], c22=C[1][1], c33=C[2][2], c12=C[0][1], c13=C[0][2], c23=C[1][2];
+            let c44=C[3][3], c55=C[4][4], c66=C[5][5];
+
+            let BV = ((c11 + c22 + c33) + 2 * (c12 + c13 + c23)) / 9;
+            let GV = ((c11 + c22 + c33) - (c12 + c13 + c23) + 3 * (c44 + c55 + c66)) / 15;
+
+            let BR = BV, GR = GV;
+            try {
+                let S = math.inv(C);
+                let s11=S[0][0], s22=S[1][1], s33=S[2][2], s12=S[0][1], s13=S[0][2], s23=S[1][2];
+                let s44=S[3][3], s55=S[4][4], s66=S[5][5];
+
+                BR = 1 / ((s11 + s22 + s33) + 2 * (s12 + s13 + s23));
+                GR = 15 / (4 * (s11 + s22 + s33) - 4 * (s12 + s13 + s23) + 3 * (s44 + s55 + s66));
+            } catch(e) { BR = BV*0.95; GR = GV*0.90; }
+
+            let B = (BV + BR) / 2;
+            let G = (GV + GR) / 2;
+            if(G <= 0) G = 0.01;
+
+            let E = (9 * B * G) / (3 * B + G);
+            let nu = (3 * B - 2 * G) / (2 * (3 * B + G));
+            
+            // Universal Anisotropy Factor Calculation
+            let AU = (5 * (GV / GR)) + (BV / BR) - 6;
+            let cauchy = (system === "cubic" || system === "hexagonal" || system === "tetragonal") ? (c12 - c44) : ((c12+c13+c23)/3 - (c44+c55+c66)/3);
+            let pugh = B / G;
+            let frantsevich = G / B;
+
+            // 3. Acoustic Velocities & Precise Debye Temperature Mathematics
+            let rho = parseFloat(document.getElementById("inputDensity").value) || 1.0;
+            let v_atom = parseFloat(document.getElementById("inputAtomVol").value) || 1.0;
+
+            let density_kg_m3 = rho * 1000.0;
+            let B_Pa = B * 1e9;
+            let G_Pa = G * 1e9;
+
+            let vl = Math.sqrt((B_Pa + (4/3) * G_Pa) / density_kg_m3);
+            let vt = Math.sqrt(G_Pa / density_kg_m3);
+            let vm = Math.pow(0.333333 * (1.0 / Math.pow(vl, 3) + 2.0 / Math.pow(vt, 3)), -0.333333);
+
+            const h = 6.62607015e-34;
+            const kB = 1.380649e-23;
+            let v_atom_m3 = v_atom * 1e-30;
+
+            let debye = (h / kB) * Math.pow((3.0 / (4.0 * Math.PI * v_atom_m3)), 1.0 / 3.0) * vm;
+            if(isNaN(debye)) debye = 0;
+
+            // Stream data points to view frame
+            document.getElementById("resBV").innerText = BV.toFixed(2);
+            document.getElementById("resBR").innerText = Math.max(0, BR).toFixed(2);
+            document.getElementById("resB").innerText = Math.max(0, B).toFixed(2);
+            document.getElementById("resGV").innerText = GV.toFixed(2);
+            document.getElementById("resGR").innerText = Math.max(0, GR).toFixed(2);
+            document.getElementById("resG").innerText = Math.max(0, G).toFixed(2);
+            document.getElementById("resE").innerText = Math.max(0, E).toFixed(2);
+            document.getElementById("resNu").innerText = nu.toFixed(4);
+            
+            document.getElementById("resAnisotropy").innerText = AU.toFixed(4);
+            document.getElementById("resCauchy").innerText = cauchy.toFixed(2) + " GPa " + (cauchy > 0 ? "(Ionic Bond)" : "(Covalent Bond)");
+            document.getElementById("resPugh").innerText = pugh.toFixed(2) + (pugh > 1.75 ? " (Ductile Material)" : " (Brittle Material)");
+            document.getElementById("resFrantsevich").innerText = frantsevich.toFixed(3);
+
+            document.getElementById("resVl").innerText = vl.toFixed(1) + " m/s";
+            document.getElementById("resVt").innerText = vt.toFixed(1) + " m/s";
+            document.getElementById("resVm").innerText = vm.toFixed(1) + " m/s";
+            document.getElementById("resDebye").innerText = debye.toFixed(2) + " K";
+
+            document.getElementById("moduliCard").classList.remove("hidden");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phonon Dispersion & DOS Suite</title>
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --glass-card: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-glow: #f8fafc;
+            --text-dim: #94a3b8;
+            --glow-indigo: #6366f1;
+            --glow-cyan: #06b6d4;
+            --glow-purple: #a855f7;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 95% 90%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+            color: var(--text-glow);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 96%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            width: 100%;
+        }
+
+        .top-nav h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.03em;
+        }
+
+        .top-nav p {
+            color: var(--text-dim);
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--text-dim);
+        }
+
+        .studio-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 1.5rem;
+            width: 100%;
+            align-items: start;
+        }
+
+        .control-stack {
+            flex: 0 0 45%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .visualization-column {
+            flex: 0 0 55%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .glass-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .glass-card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            color: var(--text-glow);
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, input, textarea {
+            background-color: rgba(10, 15, 30, 0.5);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.6rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            outline: none;
+            transition: all 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        button {
+            color: white;
+            border: none;
+            padding: 0.7rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 0.5rem;
+        }
+
+        .btn-indigo { background: linear-gradient(135deg, var(--glow-indigo), #4f46e5); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15); }
+        .btn-indigo:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3); }
+
+        .btn-purple { background: linear-gradient(135deg, var(--glow-purple), #9333ea); box-shadow: 0 4px 15px rgba(168, 85, 247, 0.15); }
+        .btn-purple:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3); }
+
+        .toggle-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+            background: rgba(0,0,0,0.2);
+            padding: 0.6rem;
+            border-radius: 8px;
+            border: 1px dashed var(--glass-border);
+        }
+
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            color: var(--text-glow);
+            cursor: pointer;
+        }
+
+        .toggle-item input[type="checkbox"] {
+            width: auto;
+            accent-color: var(--glow-cyan);
+            cursor: pointer;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="top-nav">
+            <div>
+                <h1>Phonon Dispersion & DOS Studio</h1>
+                <p>Advanced Combined Phonon Band Structure and DOS Visualizer</p>
+            </div>
+            <a href="index.html" class="back-btn">← Back to Overview</a>
+        </header>
+
+        <section class="studio-layout">
+            
+            <div class="control-stack">
+                
+                <!-- Display Mode and Units Configuration -->
+                <div class="glass-card">
+                    <h2>1. Layout & Display Settings</h2>
+                    <div class="grid-inputs" style="margin-bottom:0;">
+                        <div class="form-panel">
+                            <label>Combined Plot Layout</label>
+                            <select id="plotMode" onchange="renderCombinedPlot()">
+                                <option value="side" selected>Side-by-Side (Shared Frequency Y-Axis)</option>
+                                <option value="stacked">Stacked Vertical (One Above Another)</option>
+                            </select>
+                        </div>
+                        <div class="form-panel">
+                            <label>Frequency Display Unit</label>
+                            <select id="freqUnit" onchange="renderCombinedPlot()">
+                                <option value="THz" selected>THz (Terahertz)</option>
+                                <option value="cm1">cm⁻¹ (Wavenumber)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phonon Dispersion Engine -->
+                <div class="glass-card">
+                    <h2>2. Phonon Dispersion Curves</h2>
+                    
+                    <div class="grid-inputs">
+                        <div class="form-panel">
+                            <label>X Axis (q-coordinates)</label>
+                            <textarea id="dispX" placeholder="0.0&#10;0.1&#10;0.2&#10;0.3"></textarea>
+                        </div>
+                        <div class="form-panel">
+                            <label>Y Axis (Any Number of Branches)</label>
+                            <textarea id="dispY" placeholder="0.0  4.2  6.5 ...&#10;0.8  4.5  6.8 ...&#10;1.5  4.9  7.2 ...&#10;2.1  5.1  7.5 ..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-panel" style="margin-bottom: 0.5rem;">
+                        <label>Number of High-Symmetry Points</label>
+                        <input type="number" id="numKPoints" min="0" value="0" placeholder="e.g. 4, 5, 8..." oninput="generateKPointInputs()">
+                    </div>
+
+                    <div id="kPointsContainer" class="grid-inputs"></div>
+
+                    <button type="button" class="btn-indigo" onclick="processDispersionData(); renderCombinedPlot();">Update Dispersion Data</button>
+                </div>
+
+                <!-- Phonon DOS & Atomic PDOS Engine -->
+                <div class="glass-card">
+                    <h2>3. Phonon DOS & Atomic PDOS</h2>
+
+                    <div class="form-panel" style="margin-bottom: 0.75rem;">
+                        <label>Number of Partial Atoms</label>
+                        <input type="number" id="numAtoms" min="0" value="1" oninput="buildAtomConfig()">
+                    </div>
+
+                    <div id="atomsConfigContainer" class="grid-inputs"></div>
+
+                    <button type="button" class="btn-purple" onclick="generateDOSInputs()">Generate DOS Data Columns</button>
+
+                    <div id="dosDataBlock" class="hidden" style="margin-top: 1rem;">
+                        <div class="form-panel" style="margin-bottom: 0.75rem;">
+                            <label>Frequency Axis Values</label>
+                            <textarea id="dosX" placeholder="0.0&#10;1.0&#10;2.0&#10;3.0"></textarea>
+                        </div>
+
+                        <div id="dosColumnsContainer" class="grid-inputs"></div>
+
+                        <label style="margin-top:0.5rem;">Column Visibility Toggles:</label>
+                        <div id="visibilityToggles" class="toggle-group"></div>
+
+                        <button type="button" class="btn-purple" onclick="processDOSData(); renderCombinedPlot();">Update DOS Data</button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Visualization Column -->
+            <div class="visualization-column">
+                <div class="glass-card id-chart-container" style="min-height: 620px;">
+                    <div id="phononPlot" style="width:100%; height:580px;"></div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        // Data Stores
+        let dispersionBranches = [];
+        let dispXValues = [];
+        let kPointData = [];
+
+        let dosFreqValues = [];
+        let dosColumns = [];
+        let dosColumnNames = [];
+
+        // Dynamic Inputs Generation
+        function generateKPointInputs() {
+            const count = parseInt(document.getElementById("numKPoints").value) || 0;
+            const container = document.getElementById("kPointsContainer");
+            container.innerHTML = "";
+
+            for (let i = 0; i < count; i++) {
+                container.innerHTML += `
+                    <div class="form-panel">
+                        <label>Point ${i+1} Label & X Pos</label>
+                        <div style="display:flex; gap:0.3rem;">
+                            <input type="text" class="k-name" placeholder="Name (e.g. Gamma)" style="width:50%;">
+                            <input type="number" step="any" class="k-pos" placeholder="X Pos" style="width:50%;">
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function buildAtomConfig() {
+            const count = parseInt(document.getElementById("numAtoms").value) || 0;
+            const container = document.getElementById("atomsConfigContainer");
+            container.innerHTML = "";
+
+            for (let i = 0; i < count; i++) {
+                container.innerHTML += `
+                    <div class="form-panel">
+                        <label>Atom ${i+1} Symbol</label>
+                        <input type="text" class="atom-symbol" placeholder="e.g. Cu, Fe, S">
+                    </div>
+                `;
+            }
+        }
+        buildAtomConfig();
+
+        function generateDOSInputs() {
+            const container = document.getElementById("dosColumnsContainer");
+            const toggleContainer = document.getElementById("visibilityToggles");
+            container.innerHTML = "";
+            toggleContainer.innerHTML = "";
+
+            let colIndex = 0;
+
+            container.innerHTML += `
+                <div class="form-panel">
+                    <label>Total Phonon DOS</label>
+                    <textarea class="dos-col-data" data-col="${colIndex}" placeholder="Data values..."></textarea>
+                </div>
+            `;
+            toggleContainer.innerHTML += `
+                <label class="toggle-item">
+                    <input type="checkbox" class="dos-vis-check" data-col="${colIndex}" checked onchange="renderCombinedPlot()"> Total Phonon DOS
+                </label>
+            `;
+            colIndex++;
+
+            const atomInputs = document.querySelectorAll(".atom-symbol");
+            atomInputs.forEach((input, idx) => {
+                const symbol = input.value.trim() || `Atom_${idx+1}`;
+                const colName = `${symbol} (PDOS)`;
+
+                container.innerHTML += `
+                    <div class="form-panel">
+                        <label>${colName}</label>
+                        <textarea class="dos-col-data" data-col="${colIndex}" placeholder="Data values..."></textarea>
+                    </div>
+                `;
+                toggleContainer.innerHTML += `
+                    <label class="toggle-item">
+                        <input type="checkbox" class="dos-vis-check" data-col="${colIndex}" checked onchange="renderCombinedPlot()"> ${colName}
+                    </label>
+                `;
+                colIndex++;
+            });
+
+            document.getElementById("dosDataBlock").classList.remove("hidden");
+        }
+
+        function processDispersionData() {
+            dispXValues = document.getElementById("dispX").value.trim().split('\n').map(Number);
+            const rawYLines = document.getElementById("dispY").value.trim().split('\n');
+
+            dispersionBranches = [];
+            rawYLines.forEach(line => {
+                let parts = line.trim().split(/\s+/).map(Number);
+                if (parts.length > 0 && !parts.some(isNaN)) {
+                    if (dispersionBranches.length === 0) {
+                        for (let b = 0; b < parts.length; b++) dispersionBranches.push([]);
+                    }
+                    for (let b = 0; b < parts.length; b++) {
+                        dispersionBranches[b].push(parts[b]);
+                    }
+                }
+            });
+
+            kPointData = [];
+            const kNames = document.querySelectorAll(".k-name");
+            const kPos = document.querySelectorAll(".k-pos");
+            kNames.forEach((el, idx) => {
+                const name = el.value.trim();
+                const pos = parseFloat(kPos[idx].value);
+                if (name && !isNaN(pos)) {
+                    kPointData.push({ name: name, pos: pos });
+                }
+            });
+        }
+
+        function processDOSData() {
+            dosFreqValues = document.getElementById("dosX").value.trim().split('\n').map(Number);
+            const colTextareas = document.querySelectorAll(".dos-col-data");
+            
+            dosColumns = [];
+            dosColumnNames = [];
+
+            const atomInputs = document.querySelectorAll(".atom-symbol");
+            let names = ["Total Phonon DOS"];
+            atomInputs.forEach((input, idx) => {
+                names.push((input.value.trim() || `Atom_${idx+1}`) + " (PDOS)");
+            });
+
+            colTextareas.forEach((ta, idx) => {
+                const vals = ta.value.trim().split('\n').map(Number);
+                dosColumns.push(vals);
+                dosColumnNames.push(names[idx] || `Col ${idx+1}`);
+            });
+        }
+
+        function renderCombinedPlot() {
+            const plotMode = document.getElementById("plotMode").value;
+            const unitType = document.getElementById("freqUnit").value;
+            const unitLabel = (unitType === "cm1") ? "cm⁻¹" : "THz";
+
+            const hasDispersion = dispXValues.length > 0 && dispersionBranches.length > 0;
+            const hasDOS = dosFreqValues.length > 0 && dosColumns.length > 0;
+
+            if (!hasDispersion && !hasDOS) {
+                Plotly.purge('phononPlot');
+                return;
+            }
+
+            let traces = [];
+            let layout = {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 30, b: 60, l: 70, r: 30 },
+                showlegend: true,
+                legend: { font: { color: '#f8fafc' }, orientation: 'h', y: -0.2 }
+            };
+
+            const colors = ['#6366f1', '#10b981', '#fbbf24', '#a855f7', '#f43f5e', '#06b6d4'];
+            const visChecks = document.querySelectorAll(".dos-vis-check");
+
+            if (hasDispersion && hasDOS) {
+                if (plotMode === "side") {
+                    // --- Side-by-Side Mode ---
+                    
+                    // Calculate absolute global Y limits to force 100% strict sync
+                    let allY = [];
+                    dispersionBranches.forEach(branch => allY.push(...branch));
+                    if (dosFreqValues.length > 0) allY.push(...dosFreqValues);
+                    
+                    let yMin = Math.min(...allY);
+                    let yMax = Math.max(...allY);
+                    let padding = (yMax - yMin) * 0.05;
+                    yMin = yMin < 0 ? yMin - padding : 0;
+                    yMax = yMax + padding;
+
+                    // 1. Dispersion Traces (Left Subplot -> x1, y1)
+                    dispersionBranches.forEach((bData, idx) => {
+                        traces.push({
+                            x: dispXValues,
+                            y: bData,
+                            xaxis: 'x',
+                            yaxis: 'y',
+                            mode: 'lines',
+                            name: `Branch ${idx+1}`,
+                            line: { color: '#06b6d4', width: 2 },
+                            showlegend: false
+                        });
+                    });
+
+                    // 2. DOS Traces (Right Subplot -> x2, y1: Directly using Y1 for absolute alignment!)
+                    dosColumns.forEach((colVals, idx) => {
+                        const isVisible = visChecks[idx] ? visChecks[idx].checked : true;
+                        if (isVisible) {
+                            traces.push({
+                                x: colVals,
+                                y: dosFreqValues,
+                                xaxis: 'x2',
+                                yaxis: 'y', // Share exact same Y-axis instance!
+                                mode: 'lines',
+                                name: dosColumnNames[idx] || `DOS ${idx+1}`,
+                                line: { color: colors[idx % colors.length], width: 2 }
+                            });
+                        }
+                    });
+
+                    let shapes = [];
+                    let tickVals = [];
+                    let tickTexts = [];
+                    kPointData.forEach(kp => {
+                        tickVals.push(kp.pos);
+                        tickTexts.push(kp.name);
+                        shapes.push({
+                            type: 'line', x0: kp.pos, x1: kp.pos, y0: 0, y1: 1, yref: 'paper',
+                            line: { color: 'rgba(255,255,255,0.25)', width: 1.5, dash: 'dash' }
+                        });
+                    });
+
+                    layout.shapes = shapes;
+
+                    // Single Shared Y Axis Configuration
+                    layout.yaxis = {
+                        range: [yMin, yMax],
+                        title: { text: `Frequency (${unitLabel})`, font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)',
+                        showline: true, linecolor: '#94a3b8',
+                        zeroline: true, zerolinecolor: 'rgba(244, 63, 94, 0.4)'
+                    };
+
+                    // Left Subplot X-Axis (q-path)
+                    layout.xaxis = {
+                        domain: [0, 0.68],
+                        title: { text: tickVals.length > 0 ? '' : 'q-Vector Path', font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)',
+                        showline: true, linecolor: '#94a3b8',
+                        zeroline: false,
+                        tickmode: tickVals.length > 0 ? 'array' : 'auto',
+                        tickvals: tickVals,
+                        ticktext: tickTexts
+                    };
+
+                    // Right Subplot X-Axis (DOS intensity)
+                    layout.xaxis2 = {
+                        domain: [0.72, 1.0],
+                        title: { text: 'DOS / PDOS', font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)',
+                        showline: true, linecolor: '#94a3b8'
+                    };
+
+                } else {
+                    // --- Stacked Mode ---
+                    dispersionBranches.forEach((bData, idx) => {
+                        traces.push({
+                            x: dispXValues,
+                            y: bData,
+                            xaxis: 'x',
+                            yaxis: 'y',
+                            mode: 'lines',
+                            name: `Branch ${idx+1}`,
+                            line: { color: '#06b6d4', width: 2 },
+                            showlegend: false
+                        });
+                    });
+
+                    dosColumns.forEach((colVals, idx) => {
+                        const isVisible = visChecks[idx] ? visChecks[idx].checked : true;
+                        if (isVisible) {
+                            traces.push({
+                                x: dosFreqValues,
+                                y: colVals,
+                                xaxis: 'x2',
+                                yaxis: 'y2',
+                                mode: 'lines',
+                                name: dosColumnNames[idx] || `DOS ${idx+1}`,
+                                line: { color: colors[idx % colors.length], width: 2 }
+                            });
+                        }
+                    });
+
+                    let shapes = [];
+                    let tickVals = [];
+                    let tickTexts = [];
+                    kPointData.forEach(kp => {
+                        tickVals.push(kp.pos);
+                        tickTexts.push(kp.name);
+                        shapes.push({
+                            type: 'line', x0: kp.pos, x1: kp.pos, y0: 0.55, y1: 1.0, yref: 'paper',
+                            line: { color: 'rgba(255,255,255,0.25)', width: 1.5, dash: 'dash' }
+                        });
+                    });
+
+                    layout.shapes = shapes;
+
+                    layout.xaxis = {
+                        domain: [0, 1.0], anchor: 'y',
+                        title: { text: tickVals.length > 0 ? '' : 'q-Vector Path', font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8',
+                        tickmode: tickVals.length > 0 ? 'array' : 'auto', tickvals: tickVals, ticktext: tickTexts
+                    };
+                    layout.yaxis = {
+                        domain: [0.55, 1.0],
+                        title: { text: `Dispersion (${unitLabel})`, font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8'
+                    };
+
+                    layout.xaxis2 = {
+                        domain: [0, 1.0], anchor: 'y2',
+                        title: { text: `Frequency (${unitLabel})`, font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8'
+                    };
+                    layout.yaxis2 = {
+                        domain: [0, 0.42],
+                        title: { text: 'Phonon DOS / PDOS', font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8'
+                    };
+                }
+
+            } else if (hasDispersion) {
+                // Dispersion Only
+                dispersionBranches.forEach((bData, idx) => {
+                    traces.push({
+                        x: dispXValues,
+                        y: bData,
+                        mode: 'lines',
+                        name: `Branch ${idx+1}`,
+                        line: { color: '#06b6d4', width: 2 },
+                        showlegend: false
+                    });
+                });
+
+                let shapes = [];
+                let tickVals = [];
+                let tickTexts = [];
+                kPointData.forEach(kp => {
+                    tickVals.push(kp.pos);
+                    tickTexts.push(kp.name);
+                    shapes.push({
+                        type: 'line', x0: kp.pos, x1: kp.pos, y0: 0, y1: 1, yref: 'paper',
+                        line: { color: 'rgba(255,255,255,0.25)', width: 1.5, dash: 'dash' }
+                    });
+                });
+
+                layout.shapes = shapes;
+                layout.xaxis = {
+                    title: { text: tickVals.length > 0 ? '' : 'q-Vector Path', font: { color: '#f8fafc', size: 12 } },
+                    tickfont: { color: '#f8fafc', size: 11 },
+                    gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8',
+                    tickmode: tickVals.length > 0 ? 'array' : 'auto', tickvals: tickVals, ticktext: tickTexts
+                };
+                layout.yaxis = {
+                    title: { text: `Frequency (${unitLabel})`, font: { color: '#f8fafc', size: 12 } },
+                    tickfont: { color: '#f8fafc', size: 11 },
+                    gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8'
+                };
+
+            } else if (hasDOS) {
+                // DOS Only
+                dosColumns.forEach((colVals, idx) => {
+                    const isVisible = visChecks[idx] ? visChecks[idx].checked : true;
+                    if (isVisible) {
+                        traces.push({
+                            x: dosFreqValues,
+                            y: colVals,
+                            mode: 'lines',
+                            name: dosColumnNames[idx] || `DOS ${idx+1}`,
+                            line: { color: colors[idx % colors.length], width: 2 }
+                        });
+                    }
+                });
+
+                layout.xaxis = {
+                    title: { text: `Frequency (${unitLabel})`, font: { color: '#f8fafc', size: 12 } },
+                    tickfont: { color: '#f8fafc', size: 11 },
+                    gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8'
+                };
+                layout.yaxis = {
+                    title: { text: 'Phonon DOS / PDOS', font: { color: '#f8fafc', size: 12 } },
+                    tickfont: { color: '#f8fafc', size: 11 },
+                    gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8'
+                };
+            }
+
+            Plotly.newPlot('phononPlot', traces, layout, { responsive: true });
+        }
+    </script>
+</body>
+</html>

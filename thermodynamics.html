@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thermodynamic Analytics | Optik Style</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --panel-bg: #111827;
+            --panel-border: #1f2937;
+            --accent-glow: #3b82f6;
+            --accent-hover: #2563eb;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --input-bg: #030712;
+            --btn-success: #10b981;
+            --btn-success-hover: #059669;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 380px;
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--panel-border);
+            display: flex;
+            flex-direction: column;
+            padding: 1.25rem;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .brand-header h2 {
+            font-size: 1.1rem;
+            margin: 0;
+            color: var(--text-main);
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--text-main);
+            background: var(--accent-glow);
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-bottom: 0.6rem;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        select, input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--panel-border);
+            color: var(--text-main);
+            padding: 0.5rem 0.65rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            border-color: var(--accent-glow);
+        }
+
+        .range-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.4rem;
+        }
+
+        .range-grid input {
+            text-align: center;
+        }
+
+        .press-add-box {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-add {
+            background-color: var(--accent-glow);
+            color: white;
+            border: none;
+            padding: 0 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .press-tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .press-tag {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            color: #93c5fd;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .press-tag span {
+            cursor: pointer;
+            color: #f87171;
+            font-weight: bold;
+        }
+
+        .columns-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+            gap: 0.5rem;
+            max-height: 180px;
+            overflow-y: auto;
+            background: var(--input-bg);
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--panel-border);
+        }
+
+        .col-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .col-box label {
+            font-size: 0.7rem;
+            text-align: center;
+            color: var(--accent-glow);
+            font-weight: bold;
+        }
+
+        .col-box textarea {
+            height: 100px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            resize: none;
+            padding: 0.3rem;
+        }
+
+        .btn-plot {
+            width: 100%;
+            background-color: var(--accent-glow);
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 0.8rem;
+            transition: background 0.2s;
+        }
+
+        .btn-plot:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Viewport & Download Button Styling */
+        .main-viewport {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-main);
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .viewport-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .viewport-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .btn-download {
+            background-color: var(--btn-success);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background 0.2s;
+        }
+
+        .btn-download:hover {
+            background-color: var(--btn-success-hover);
+        }
+
+        .chart-container {
+            flex: 1;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 1rem;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- Sidebar Controls -->
+        <div class="sidebar">
+            <div class="brand-header">
+                <h2>ZA Workbench</h2>
+                <a href="index.html" class="back-link">← Back</a>
+            </div>
+
+            <!-- Property Selection -->
+            <div class="form-group">
+                <div class="section-title">1. Select Thermodynamic Property</div>
+                <select id="propertySelect" onchange="updateView()">
+                    <option value="volume">Volume (V)</option>
+                    <option value="debye">Debye Temperature (Θ_D)</option>
+                    <option value="entropy">Entropy (S)</option>
+                    <option value="cv">Heat Capacity (Cv)</option>
+                    <option value="cp">Heat Capacity (Cp)</option>
+                    <option value="bulk">Bulk Modulus (B)</option>
+                    <option value="expansion">Thermal Expansion (α)</option>
+                </select>
+            </div>
+
+            <!-- Target Pressures Input -->
+            <div class="form-group">
+                <div class="section-title">2. Target Pressures (GPa)</div>
+                <div class="press-add-box">
+                    <input type="number" id="pressInput" placeholder="e.g. 10">
+                    <button class="btn-add" onclick="addPressure()">Add</button>
+                </div>
+                <div class="press-tags-list" id="pressTags"></div>
+            </div>
+
+            <!-- Temperature X-Axis Domain & Range -->
+            <div class="form-group">
+                <div class="section-title">3. Temperature Range (K)</div>
+                <div class="range-grid">
+                    <div>
+                        <label>T Min</label>
+                        <input type="number" id="xMin" value="0" step="50" onchange="renderChart()">
+                    </div>
+                    <div>
+                        <label>T Max</label>
+                        <input type="number" id="xMax" value="1000" step="50" onchange="renderChart()">
+                    </div>
+                    <div>
+                        <label>Step Size</label>
+                        <input type="number" id="xStep" value="200" step="50" onchange="renderChart()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Input Columns -->
+            <div class="form-group">
+                <div class="section-title">4. Data Columns Input</div>
+                <div class="columns-wrapper" id="columnsContainer"></div>
+            </div>
+
+            <button class="btn-plot" onclick="renderChart()">⚡ Plot Property Spectrum</button>
+        </div>
+
+        <!-- Main Workspace Viewport -->
+        <div class="main-viewport">
+            <div class="viewport-header">
+                <div class="viewport-title" id="graphTitle">Volume (V) vs Temperature</div>
+                <button class="btn-download" onclick="downloadPlot()">📷 Download Plot (PNG)</button>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="thermoChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let chartInstance = null;
+        let activePressures = [0, 10, 20];
+
+        const propertyUnits = {
+            volume: { name: 'Volume (V)', unit: 'Å³' },
+            debye: { name: 'Debye Temperature (Θ_D)', unit: 'K' },
+            entropy: { name: 'Entropy (S)', unit: 'J/mol·K' },
+            cv: { name: 'Heat Capacity (Cv)', unit: 'J/mol·K' },
+            cp: { name: 'Heat Capacity (Cp)', unit: 'J/mol·K' },
+            bulk: { name: 'Bulk Modulus (B)', unit: 'GPa' },
+            expansion: { name: 'Thermal Expansion (α)', unit: '10⁻⁵ K⁻¹' }
+        };
+
+        const colorsList = ['#3b82f6', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899'];
+
+        // Custom plugin to ensure dark background on exported PNGs
+        const darkBackgroundPlugin = {
+            id: 'customCanvasBackgroundColor',
+            beforeDraw: (chart) => {
+                const {ctx} = chart;
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-over';
+                ctx.fillStyle = '#111827';
+                ctx.fillRect(0, 0, chart.width, chart.height);
+                ctx.restore();
+            }
+        };
+
+        function renderPressTags() {
+            const container = document.getElementById('pressTags');
+            container.innerHTML = '';
+            activePressures.forEach((p, index) => {
+                const tag = document.createElement('div');
+                tag.className = 'press-tag';
+                tag.innerHTML = `${p} GPa <span onclick="removePressure(${index})">&times;</span>`;
+                container.appendChild(tag);
+            });
+            buildDataColumns();
+        }
+
+        function addPressure() {
+            const val = parseFloat(document.getElementById('pressInput').value);
+            if (!isNaN(val) && !activePressures.includes(val)) {
+                activePressures.push(val);
+                activePressures.sort((a, b) => a - b);
+                document.getElementById('pressInput').value = '';
+                renderPressTags();
+                renderChart();
+            }
+        }
+
+        function removePressure(index) {
+            activePressures.splice(index, 1);
+            renderPressTags();
+            renderChart();
+        }
+
+        function buildDataColumns() {
+            const container = document.getElementById('columnsContainer');
+            container.innerHTML = '';
+
+            const xBox = document.createElement('div');
+            xBox.className = 'col-box';
+            xBox.innerHTML = `
+                <label>Temp (K)</label>
+                <textarea id="col_X" placeholder="Temperature values">0\n200\n400\n600\n800\n1000</textarea>
+            `;
+            container.appendChild(xBox);
+
+            activePressures.forEach(P => {
+                const box = document.createElement('div');
+                box.className = 'col-box';
+                box.innerHTML = `
+                    <label>${P} GPa</label>
+                    <textarea id="col_P_${P}" placeholder="Y values">100\n101\n102\n104\n106\n108</textarea>
+                `;
+                container.appendChild(box);
+            });
+        }
+
+        function updateView() {
+            const propKey = document.getElementById('propertySelect').value;
+            document.getElementById('graphTitle').innerText = `${propertyUnits[propKey].name} vs Temperature`;
+            buildDataColumns();
+            renderChart();
+        }
+
+        function renderChart() {
+            const propKey = document.getElementById('propertySelect').value;
+
+            const xText = document.getElementById('col_X') ? document.getElementById('col_X').value.trim() : "";
+            const xRaw = xText.split('\n').filter(v => v !== '').map(Number);
+
+            const xMin = parseFloat(document.getElementById('xMin').value);
+            const xMax = parseFloat(document.getElementById('xMax').value);
+            const xStep = parseFloat(document.getElementById('xStep').value);
+
+            let datasets = [];
+
+            activePressures.forEach((P, i) => {
+                const textarea = document.getElementById(`col_P_${P}`);
+                if (textarea) {
+                    const yRaw = textarea.value.trim().split('\n').filter(v => v !== '').map(Number);
+                    let dataPoints = xRaw.map((x, idx) => ({ x: x, y: yRaw[idx] }));
+
+                    datasets.push({
+                        label: `${P} GPa`,
+                        data: dataPoints,
+                        borderColor: colorsList[i % colorsList.length],
+                        backgroundColor: colorsList[i % colorsList.length],
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        tension: 0.35
+                    });
+                }
+            });
+
+            const ctx = document.getElementById('thermoChart').getContext('2d');
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { datasets: datasets },
+                plugins: [darkBackgroundPlugin],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#9ca3af' } }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: xMin,
+                            max: xMax,
+                            ticks: { stepSize: xStep, color: '#9ca3af' },
+                            title: { display: true, color: '#9ca3af', text: 'Temperature (K)' },
+                            grid: { color: '#1f2937' }
+                        },
+                        y: {
+                            title: { display: true, color: '#9ca3af', text: `${propertyUnits[propKey].name} (${propertyUnits[propKey].unit})` },
+                            grid: { color: '#1f2937' },
+                            ticks: { color: '#9ca3af' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function downloadPlot() {
+            if (!chartInstance) return;
+            const link = document.createElement('a');
+            const propKey = document.getElementById('propertySelect').value;
+            link.download = `${propKey}_vs_temperature.png`;
+            link.href = chartInstance.toBase64Image('image/png', 1.0);
+            link.click();
+        }
+
+        window.onload = function() {
+            renderPressTags();
+            renderChart();
+        };
+    </script>
+</body>
+</html>

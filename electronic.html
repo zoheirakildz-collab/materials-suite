@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electronic Structure & DOS Suite</title>
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --glass-card: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-glow: #f8fafc;
+            --text-dim: #94a3b8;
+            --glow-indigo: #6366f1;
+            --glow-cyan: #06b6d4;
+            --glow-purple: #a855f7;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 95% 90%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+            color: var(--text-glow);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 96%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            width: 100%;
+        }
+
+        .top-nav h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.03em;
+        }
+
+        .top-nav p {
+            color: var(--text-dim);
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--text-dim);
+        }
+
+        .studio-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 1.5rem;
+            width: 100%;
+            align-items: start;
+        }
+
+        .control-stack {
+            flex: 0 0 45%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .visualization-column {
+            flex: 0 0 55%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .glass-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .glass-card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            color: var(--text-glow);
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, input, textarea {
+            background-color: rgba(10, 15, 30, 0.5);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.6rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            outline: none;
+            transition: all 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        button {
+            color: white;
+            border: none;
+            padding: 0.7rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 0.5rem;
+        }
+
+        .btn-indigo { background: linear-gradient(135deg, var(--glow-indigo), #4f46e5); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15); }
+        .btn-indigo:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3); }
+
+        .btn-purple { background: linear-gradient(135deg, var(--glow-purple), #9333ea); box-shadow: 0 4px 15px rgba(168, 85, 247, 0.15); }
+        .btn-purple:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3); }
+
+        .toggle-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+            background: rgba(0,0,0,0.2);
+            padding: 0.6rem;
+            border-radius: 8px;
+            border: 1px dashed var(--glass-border);
+        }
+
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            color: var(--text-glow);
+            cursor: pointer;
+        }
+
+        .toggle-item input[type="checkbox"] {
+            width: auto;
+            accent-color: var(--glow-cyan);
+            cursor: pointer;
+        }
+
+        .atom-block {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            padding: 0.8rem;
+            border-radius: 12px;
+            margin-bottom: 0.6rem;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="top-nav">
+            <div>
+                <h1>Electronic Structure & DOS Studio</h1>
+                <p>Advanced Electronic Band Structure & Orbitally-Projected DOS (PDOS) Visualizer</p>
+            </div>
+            <a href="index.html" class="back-btn">← Back to Overview</a>
+        </header>
+
+        <section class="studio-layout">
+            
+            <div class="control-stack">
+                
+                <!-- 1. Display Mode, Units, Energy Range & Scale Type -->
+                <div class="glass-card">
+                    <h2>1. Layout, Units & Energy Range</h2>
+                    <div class="grid-inputs" style="margin-bottom:0.75rem;">
+                        <div class="form-panel">
+                            <label>Combined Plot Layout</label>
+                            <select id="plotMode" onchange="renderCombinedPlot()">
+                                <option value="side" selected>Side-by-Side (Shared Energy Y-Axis)</option>
+                                <option value="stacked">Stacked Vertical (One Above Another)</option>
+                            </select>
+                        </div>
+                        <div class="form-panel">
+                            <label>Energy Display Unit</label>
+                            <select id="energyUnit" onchange="renderCombinedPlot()">
+                                <option value="eV" selected>eV (Electron-Volt)</option>
+                                <option value="Ry">Ry (Rydberg)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid-inputs" style="margin-bottom:0.75rem;">
+                        <div class="form-panel">
+                            <label>Energy Min (E_min)</label>
+                            <input type="number" id="eMin" step="any" placeholder="Auto" onchange="renderCombinedPlot()">
+                        </div>
+                        <div class="form-panel">
+                            <label>Energy Max (E_max)</label>
+                            <input type="number" id="eMax" step="any" placeholder="Auto" onchange="renderCombinedPlot()">
+                        </div>
+                    </div>
+
+                    <!-- السلم اللوغاريتمي للـ DOS لعرض القيم الصغيرة جداً -->
+                    <div class="grid-inputs" style="margin-bottom:0;">
+                        <div class="form-panel">
+                            <label>DOS Scale Type</label>
+                            <select id="dosScale" onchange="renderCombinedPlot()">
+                                <option value="linear" selected>Linear Scale (Default)</option>
+                                <option value="log">Logarithmic Scale (For tiny values)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Electronic Band Structure Engine -->
+                <div class="glass-card">
+                    <h2>2. Electronic Band Structure (E - E_F)</h2>
+                    
+                    <div class="grid-inputs">
+                        <div class="form-panel">
+                            <label>X Axis (k-coordinates)</label>
+                            <textarea id="bandX" placeholder="0.0&#10;0.1&#10;0.2&#10;0.3"></textarea>
+                        </div>
+                        <div class="form-panel">
+                            <label>Y Axis (Electronic Bands)</label>
+                            <textarea id="bandY" placeholder="-2.5  1.2  4.5 ...&#10;-2.1  1.5  4.8 ...&#10;-1.8  1.9  5.2 ...&#10;-1.2  2.1  5.5 ..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-panel" style="margin-bottom: 0.5rem;">
+                        <label>Number of High-Symmetry Points</label>
+                        <input type="number" id="numKPoints" min="0" value="0" placeholder="e.g. 4, 5, 8..." oninput="generateKPointInputs()">
+                    </div>
+
+                    <div id="kPointsContainer" class="grid-inputs"></div>
+
+                    <button type="button" class="btn-indigo" onclick="processBandData(); renderCombinedPlot();">Update Band Structure</button>
+                </div>
+
+                <!-- 3. Electronic DOS & Orbital-PDOS Engine -->
+                <div class="glass-card">
+                    <h2>3. Total Electronic DOS & Orbital PDOS</h2>
+
+                    <div class="form-panel" style="margin-bottom: 0.75rem;">
+                        <label>Number of Partial Atoms</label>
+                        <input type="number" id="numAtoms" min="0" value="1" oninput="buildAtomOrbitalConfig()">
+                    </div>
+
+                    <div id="atomsConfigContainer"></div>
+
+                    <button type="button" class="btn-purple" onclick="generateDOSInputs()">Generate Orbital DOS Fields</button>
+
+                    <div id="dosDataBlock" class="hidden" style="margin-top: 1rem;">
+                        <div class="form-panel" style="margin-bottom: 0.75rem;">
+                            <label>Energy Axis Values (E - E_F)</label>
+                            <textarea id="dosX" placeholder="-5.0&#10;-4.0&#10;...&#10;5.0"></textarea>
+                        </div>
+
+                        <div id="dosColumnsContainer" class="grid-inputs"></div>
+
+                        <label style="margin-top:0.5rem;">Column Visibility Toggles:</label>
+                        <div id="visibilityToggles" class="toggle-group"></div>
+
+                        <button type="button" class="btn-purple" onclick="processDOSData(); renderCombinedPlot();">Update Electronic DOS Data</button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Visualization Column -->
+            <div class="visualization-column">
+                <div class="glass-card id-chart-container" style="min-height: 620px;">
+                    <div id="electronicPlot" style="width:100%; height:580px;"></div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        let bandBranches = [];
+        let bandXValues = [];
+        let kPointData = [];
+
+        let dosEnergyValues = [];
+        let dosColumns = [];
+        let dosColumnNames = [];
+
+        const RY_TO_EV = 13.6056980659;
+
+        function generateKPointInputs() {
+            const count = parseInt(document.getElementById("numKPoints").value) || 0;
+            const container = document.getElementById("kPointsContainer");
+            container.innerHTML = "";
+
+            for (let i = 0; i < count; i++) {
+                container.innerHTML += `
+                    <div class="form-panel">
+                        <label>Point ${i+1} Label & X Pos</label>
+                        <div style="display:flex; gap:0.3rem;">
+                            <input type="text" class="k-name" placeholder="e.g. Gamma, X, L" style="width:50%;">
+                            <input type="number" step="any" class="k-pos" placeholder="X Pos" style="width:50%;">
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function buildAtomOrbitalConfig() {
+            const count = parseInt(document.getElementById("numAtoms").value) || 0;
+            const container = document.getElementById("atomsConfigContainer");
+            container.innerHTML = "";
+
+            for (let i = 0; i < count; i++) {
+                container.innerHTML += `
+                    <div class="atom-block">
+                        <div class="grid-inputs" style="margin-bottom:0;">
+                            <div class="form-panel">
+                                <label>Atom ${i+1} Symbol</label>
+                                <input type="text" class="atom-symbol" placeholder="e.g. Cu, Fe, S">
+                            </div>
+                            <div class="form-panel">
+                                <label>Orbitals (Comma-separated)</label>
+                                <input type="text" class="atom-orbitals" placeholder="e.g. s, p, d  OR  d_xy, d_z2">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        buildAtomOrbitalConfig();
+
+        function generateDOSInputs() {
+            const container = document.getElementById("dosColumnsContainer");
+            const toggleContainer = document.getElementById("visibilityToggles");
+            container.innerHTML = "";
+            toggleContainer.innerHTML = "";
+
+            let colIndex = 0;
+
+            container.innerHTML += `
+                <div class="form-panel">
+                    <label>Total Electronic DOS</label>
+                    <textarea class="dos-col-data" data-col="${colIndex}" placeholder="Data values..."></textarea>
+                </div>
+            `;
+            toggleContainer.innerHTML += `
+                <label class="toggle-item">
+                    <input type="checkbox" class="dos-vis-check" data-col="${colIndex}" checked onchange="renderCombinedPlot()"> Total Electronic DOS
+                </label>
+            `;
+            colIndex++;
+
+            const atomBlocks = document.querySelectorAll(".atom-block");
+            atomBlocks.forEach((block, idx) => {
+                const symbol = block.querySelector(".atom-symbol").value.trim() || `Atom_${idx+1}`;
+                const rawOrbitals = block.querySelector(".atom-orbitals").value.trim();
+                const orbitals = rawOrbitals ? rawOrbitals.split(',').map(s => s.trim()) : ['s', 'p', 'd'];
+
+                orbitals.forEach(orb => {
+                    if (orb) {
+                        const colName = `${symbol}-${orb} (PDOS)`;
+                        container.innerHTML += `
+                            <div class="form-panel">
+                                <label>${colName}</label>
+                                <textarea class="dos-col-data" data-col="${colIndex}" placeholder="Data values..."></textarea>
+                            </div>
+                        `;
+                        toggleContainer.innerHTML += `
+                            <label class="toggle-item">
+                                <input type="checkbox" class="dos-vis-check" data-col="${colIndex}" checked onchange="renderCombinedPlot()"> ${colName}
+                            </label>
+                        `;
+                        colIndex++;
+                    }
+                });
+            });
+
+            document.getElementById("dosDataBlock").classList.remove("hidden");
+        }
+
+        function processBandData() {
+            bandXValues = document.getElementById("bandX").value.trim().split('\n').map(Number);
+            const rawYLines = document.getElementById("bandY").value.trim().split('\n');
+
+            bandBranches = [];
+            rawYLines.forEach(line => {
+                let parts = line.trim().split(/\s+/).map(Number);
+                if (parts.length > 0 && !parts.some(isNaN)) {
+                    if (bandBranches.length === 0) {
+                        for (let b = 0; b < parts.length; b++) bandBranches.push([]);
+                    }
+                    for (let b = 0; b < parts.length; b++) {
+                        bandBranches[b].push(parts[b]);
+                    }
+                }
+            });
+
+            kPointData = [];
+            const kNames = document.querySelectorAll(".k-name");
+            const kPos = document.querySelectorAll(".k-pos");
+            kNames.forEach((el, idx) => {
+                const name = el.value.trim();
+                const pos = parseFloat(kPos[idx].value);
+                if (name && !isNaN(pos)) {
+                    kPointData.push({ name: name, pos: pos });
+                }
+            });
+        }
+
+        function processDOSData() {
+            dosEnergyValues = document.getElementById("dosX").value.trim().split('\n').map(Number);
+            const colTextareas = document.querySelectorAll(".dos-col-data");
+            
+            dosColumns = [];
+            dosColumnNames = [];
+
+            let names = ["Total Electronic DOS"];
+            const atomBlocks = document.querySelectorAll(".atom-block");
+            atomBlocks.forEach((block, idx) => {
+                const symbol = block.querySelector(".atom-symbol").value.trim() || `Atom_${idx+1}`;
+                const rawOrbitals = block.querySelector(".atom-orbitals").value.trim();
+                const orbitals = rawOrbitals ? rawOrbitals.split(',').map(s => s.trim()) : ['s', 'p', 'd'];
+                orbitals.forEach(orb => {
+                    if (orb) names.push(`${symbol}-${orb} (PDOS)`);
+                });
+            });
+
+            colTextareas.forEach((ta, idx) => {
+                const vals = ta.value.trim().split('\n').map(Number);
+                dosColumns.push(vals);
+                dosColumnNames.push(names[idx] || `Col ${idx+1}`);
+            });
+        }
+
+        function renderCombinedPlot() {
+            const plotMode = document.getElementById("plotMode").value;
+            const unitType = document.getElementById("energyUnit").value;
+            const dosScaleType = document.getElementById("dosScale").value;
+            const unitLabel = unitType === "Ry" ? "Ry" : "eV";
+            const scaleFactor = unitType === "Ry" ? (1 / RY_TO_EV) : 1.0;
+
+            const hasBands = bandXValues.length > 0 && bandBranches.length > 0;
+            const hasDOS = dosEnergyValues.length > 0 && dosColumns.length > 0;
+
+            if (!hasBands && !hasDOS) {
+                Plotly.purge('electronicPlot');
+                return;
+            }
+
+            const customMin = parseFloat(document.getElementById("eMin").value);
+            const customMax = parseFloat(document.getElementById("eMax").value);
+            const hasCustomRange = !isNaN(customMin) && !isNaN(customMax) && customMin < customMax;
+
+            let traces = [];
+            let layout = {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 30, b: 60, l: 70, r: 30 },
+                showlegend: true,
+                legend: { font: { color: '#f8fafc' }, orientation: 'h', y: -0.2 }
+            };
+
+            const colors = ['#6366f1', '#10b981', '#fbbf24', '#a855f7', '#f43f5e', '#06b6d4'];
+            const visChecks = document.querySelectorAll(".dos-vis-check");
+
+            if (hasBands && hasDOS) {
+                let scaledBandBranches = bandBranches.map(b => b.map(v => v * scaleFactor));
+                let scaledDosEnergies = dosEnergyValues.map(v => v * scaleFactor);
+
+                let yMin, yMax;
+                if (hasCustomRange) {
+                    yMin = customMin;
+                    yMax = customMax;
+                } else {
+                    let allY = [];
+                    scaledBandBranches.forEach(branch => allY.push(...branch));
+                    if (scaledDosEnergies.length > 0) allY.push(...scaledDosEnergies);
+                    yMin = Math.min(...allY);
+                    yMax = Math.max(...allY);
+                    let padding = (yMax - yMin) * 0.05;
+                    yMin = yMin - padding;
+                    yMax = yMax + padding;
+                }
+
+                if (plotMode === "side") {
+                    scaledBandBranches.forEach((bData, idx) => {
+                        traces.push({
+                            x: bandXValues,
+                            y: bData,
+                            xaxis: 'x',
+                            yaxis: 'y',
+                            mode: 'lines',
+                            name: `Band ${idx+1}`,
+                            line: { color: '#06b6d4', width: 2 },
+                            showlegend: false
+                        });
+                    });
+
+                    dosColumns.forEach((colVals, idx) => {
+                        const isVisible = visChecks[idx] ? visChecks[idx].checked : true;
+                        if (isVisible) {
+                            // معالجة القيم الصفرية عند استخدام السلم اللوغاريتمي لمنع الخطأ
+                            let safeVals = colVals;
+                            if (dosScaleType === "log") {
+                                safeVals = colVals.map(v => v <= 0 ? 1e-10 : v);
+                            }
+
+                            traces.push({
+                                x: safeVals,
+                                y: scaledDosEnergies,
+                                xaxis: 'x2',
+                                yaxis: 'y',
+                                mode: 'lines',
+                                name: dosColumnNames[idx] || `DOS ${idx+1}`,
+                                line: { color: colors[idx % colors.length], width: 2 }
+                            });
+                        }
+                    });
+
+                    let shapes = [];
+                    let tickVals = [];
+                    let tickTexts = [];
+                    kPointData.forEach(kp => {
+                        tickVals.push(kp.pos);
+                        tickTexts.push(kp.name);
+                        shapes.push({
+                            type: 'line', x0: kp.pos, x1: kp.pos, y0: 0, y1: 1, yref: 'paper',
+                            line: { color: 'rgba(255,255,255,0.25)', width: 1.5, dash: 'dash' }
+                        });
+                    });
+
+                    shapes.push({
+                        type: 'line', x0: 0, x1: 1, xref: 'paper', y0: 0, y1: 0, yref: 'y',
+                        line: { color: '#f43f5e', width: 1.5, dash: 'dash' }
+                    });
+
+                    layout.shapes = shapes;
+
+                    layout.yaxis = {
+                        range: [yMin, yMax],
+                        title: { text: `Energy (${unitLabel})`, font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)',
+                        showline: true, linecolor: '#94a3b8',
+                        zeroline: false
+                    };
+
+                    layout.xaxis = {
+                        domain: [0, 0.68],
+                        title: { text: tickVals.length > 0 ? '' : 'k-Vector Path', font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)',
+                        showline: true, linecolor: '#94a3b8',
+                        zeroline: false,
+                        tickmode: tickVals.length > 0 ? 'array' : 'auto',
+                        tickvals: tickVals,
+                        ticktext: tickTexts
+                    };
+
+                    // دعم السلم اللوغاريتمي والتكيف التلقائي للقيم الصغرى
+                    layout.xaxis2 = {
+                        domain: [0.72, 1.0],
+                        type: dosScaleType,
+                        autorange: true,
+                        exponentformat: 'power',
+                        title: { text: `DOS / PDOS ${dosScaleType === 'log' ? '(Log)' : ''}`, font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)',
+                        showline: true, linecolor: '#94a3b8'
+                    };
+
+                } else {
+                    // Stacked Mode
+                    scaledBandBranches.forEach((bData, idx) => {
+                        traces.push({
+                            x: bandXValues,
+                            y: bData,
+                            xaxis: 'x',
+                            yaxis: 'y',
+                            mode: 'lines',
+                            name: `Band ${idx+1}`,
+                            line: { color: '#06b6d4', width: 2 },
+                            showlegend: false
+                        });
+                    });
+
+                    dosColumns.forEach((colVals, idx) => {
+                        const isVisible = visChecks[idx] ? visChecks[idx].checked : true;
+                        if (isVisible) {
+                            let safeVals = colVals;
+                            if (dosScaleType === "log") {
+                                safeVals = colVals.map(v => v <= 0 ? 1e-10 : v);
+                            }
+
+                            traces.push({
+                                x: scaledDosEnergies,
+                                y: safeVals,
+                                xaxis: 'x2',
+                                yaxis: 'y2',
+                                mode: 'lines',
+                                name: dosColumnNames[idx] || `DOS ${idx+1}`,
+                                line: { color: colors[idx % colors.length], width: 2 }
+                            });
+                        }
+                    });
+
+                    let shapes = [];
+                    let tickVals = [];
+                    let tickTexts = [];
+                    kPointData.forEach(kp => {
+                        tickVals.push(kp.pos);
+                        tickTexts.push(kp.name);
+                        shapes.push({
+                            type: 'line', x0: kp.pos, x1: kp.pos, y0: 0.55, y1: 1.0, yref: 'paper',
+                            line: { color: 'rgba(255,255,255,0.25)', width: 1.5, dash: 'dash' }
+                        });
+                    });
+
+                    shapes.push({
+                        type: 'line', x0: 0, x1: 1, xref: 'paper', y0: 0, y1: 0, yref: 'y',
+                        line: { color: '#f43f5e', width: 1.5, dash: 'dash' }
+                    });
+
+                    layout.shapes = shapes;
+
+                    layout.xaxis = {
+                        domain: [0, 1.0], anchor: 'y',
+                        title: { text: tickVals.length > 0 ? '' : 'k-Vector Path', font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8',
+                        tickmode: tickVals.length > 0 ? 'array' : 'auto', tickvals: tickVals, ticktext: tickTexts
+                    };
+                    layout.yaxis = {
+                        domain: [0.55, 1.0],
+                        range: hasCustomRange ? [yMin, yMax] : undefined,
+                        title: { text: `Energy (${unitLabel})`, font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8'
+                    };
+
+                    layout.xaxis2 = {
+                        domain: [0, 1.0], anchor: 'y2',
+                        range: hasCustomRange ? [yMin, yMax] : undefined,
+                        title: { text: `Energy (${unitLabel})`, font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8'
+                    };
+                    layout.yaxis2 = {
+                        domain: [0, 0.42],
+                        type: dosScaleType,
+                        autorange: true,
+                        exponentformat: 'power',
+                        title: { text: `Electronic DOS / PDOS ${dosScaleType === 'log' ? '(Log)' : ''}`, font: { color: '#f8fafc', size: 12 } },
+                        tickfont: { color: '#f8fafc', size: 11 },
+                        gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8'
+                    };
+                }
+
+            } else if (hasBands) {
+                let scaledBandBranches = bandBranches.map(b => b.map(v => v * scaleFactor));
+
+                scaledBandBranches.forEach((bData, idx) => {
+                    traces.push({
+                        x: bandXValues,
+                        y: bData,
+                        mode: 'lines',
+                        name: `Band ${idx+1}`,
+                        line: { color: '#06b6d4', width: 2 },
+                        showlegend: false
+                    });
+                });
+
+                let shapes = [];
+                let tickVals = [];
+                let tickTexts = [];
+                kPointData.forEach(kp => {
+                    tickVals.push(kp.pos);
+                    tickTexts.push(kp.name);
+                    shapes.push({
+                        type: 'line', x0: kp.pos, x1: kp.pos, y0: 0, y1: 1, yref: 'paper',
+                        line: { color: 'rgba(255,255,255,0.25)', width: 1.5, dash: 'dash' }
+                    });
+                });
+
+                shapes.push({
+                    type: 'line', x0: 0, x1: 1, xref: 'paper', y0: 0, y1: 0, yref: 'y',
+                    line: { color: '#f43f5e', width: 1.5, dash: 'dash' }
+                });
+
+                layout.shapes = shapes;
+                layout.xaxis = {
+                    title: { text: tickVals.length > 0 ? '' : 'k-Vector Path', font: { color: '#f8fafc', size: 12 } },
+                    tickfont: { color: '#f8fafc', size: 11 },
+                    gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8',
+                    tickmode: tickVals.length > 0 ? 'array' : 'auto', tickvals: tickVals, ticktext: tickTexts
+                };
+                layout.yaxis = {
+                    range: hasCustomRange ? [customMin, customMax] : undefined,
+                    title: { text: `Energy (${unitLabel})`, font: { color: '#f8fafc', size: 12 } },
+                    tickfont: { color: '#f8fafc', size: 11 },
+                    gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8'
+                };
+
+            } else if (hasDOS) {
+                let scaledDosEnergies = dosEnergyValues.map(v => v * scaleFactor);
+
+                dosColumns.forEach((colVals, idx) => {
+                    const isVisible = visChecks[idx] ? visChecks[idx].checked : true;
+                    if (isVisible) {
+                        let safeVals = colVals;
+                        if (dosScaleType === "log") {
+                            safeVals = colVals.map(v => v <= 0 ? 1e-10 : v);
+                        }
+
+                        traces.push({
+                            x: scaledDosEnergies,
+                            y: safeVals,
+                            mode: 'lines',
+                            name: dosColumnNames[idx] || `DOS ${idx+1}`,
+                            line: { color: colors[idx % colors.length], width: 2 }
+                        });
+                    }
+                });
+
+                layout.shapes = [{
+                    type: 'line', x0: 0, x1: 0, xref: 'x', y0: 0, y1: 1, yref: 'paper',
+                    line: { color: '#f43f5e', width: 1.5, dash: 'dash' }
+                }];
+
+                layout.xaxis = {
+                    range: hasCustomRange ? [customMin, customMax] : undefined,
+                    title: { text: `Energy (${unitLabel})`, font: { color: '#f8fafc', size: 12 } },
+                    tickfont: { color: '#f8fafc', size: 11 },
+                    gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8'
+                };
+                layout.yaxis = {
+                    type: dosScaleType,
+                    autorange: true,
+                    exponentformat: 'power',
+                    title: { text: `Electronic DOS / PDOS ${dosScaleType === 'log' ? '(Log)' : ''}`, font: { color: '#f8fafc', size: 12 } },
+                    tickfont: { color: '#f8fafc', size: 11 },
+                    gridcolor: 'rgba(255,255,255,0.08)', showline: true, linecolor: '#94a3b8'
+                };
+            }
+
+            Plotly.newPlot('electronicPlot', traces, layout, { responsive: true });
+        }
+    </script>
+</body>
+</html>

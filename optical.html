@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optical Properties Studio</title>
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --glass-card: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-glow: #f8fafc;
+            --text-dim: #94a3b8;
+            --glow-indigo: #6366f1;
+            --glow-cyan: #06b6d4;
+            --glow-purple: #a855f7;
+            --glow-emerald: #10b981;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 95% 90%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+            color: var(--text-glow);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 96%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            width: 100%;
+        }
+
+        .top-nav h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.03em;
+        }
+
+        .top-nav p {
+            color: var(--text-dim);
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--text-dim);
+        }
+
+        .studio-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 1.5rem;
+            width: 100%;
+            align-items: start;
+        }
+
+        .control-stack {
+            flex: 0 0 45%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .visualization-column {
+            flex: 0 0 55%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+
+        .glass-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .glass-card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            color: var(--text-glow);
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, input, textarea {
+            background-color: rgba(10, 15, 30, 0.5);
+            border: 1px solid var(--glass-border);
+            color: var(--text-glow);
+            padding: 0.6rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            outline: none;
+            transition: all 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+        }
+
+        textarea {
+            height: 110px;
+            resize: vertical;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        button {
+            color: white;
+            border: none;
+            padding: 0.7rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 0.5rem;
+        }
+
+        .btn-cyan { background: linear-gradient(135deg, var(--glow-cyan), #0891b2); box-shadow: 0 4px 15px rgba(6, 182, 212, 0.15); }
+        .btn-cyan:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6, 182, 212, 0.3); }
+
+        .toggle-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+            background: rgba(0,0,0,0.2);
+            padding: 0.6rem;
+            border-radius: 8px;
+            border: 1px dashed var(--glass-border);
+        }
+
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            color: var(--text-glow);
+            cursor: pointer;
+        }
+
+        .toggle-item input[type="checkbox"] {
+            width: auto;
+            accent-color: var(--glow-cyan);
+            cursor: pointer;
+        }
+
+        .tensor-block {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            padding: 0.8rem;
+            border-radius: 12px;
+            margin-bottom: 0.6rem;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="top-nav">
+            <div>
+                <h1>Optical Properties Studio</h1>
+                <p>DFT Optical Response Visualizer (Dielectric Function, Absorption, EELS & More)</p>
+            </div>
+            <a href="index.html" class="back-btn">← Back to Overview</a>
+        </header>
+
+        <section class="studio-layout">
+            
+            <div class="control-stack">
+                
+                <!-- 1. Settings, Energy Range and Units -->
+                <div class="glass-card">
+                    <h2>1. Target Function, Energy Range & Scale</h2>
+                    
+                    <div class="grid-inputs" style="margin-bottom:0.75rem;">
+                        <div class="form-panel">
+                            <label>Optical Spectrum Function</label>
+                            <select id="opticalFunc" onchange="renderOpticalPlot()">
+                                <option value="dielectric" selected>Dielectric Function (ε₁ & ε₂)</option>
+                                <option value="absorption">Absorption Coefficient α(ω)</option>
+                                <option value="refraction">Refractive Index (n & k)</option>
+                                <option value="reflectivity">Reflectivity R(ω)</option>
+                                <option value="eels">Energy Loss Function (EELS)</option>
+                                <option value="conductivity">Optical Conductivity σ(ω)</option>
+                            </select>
+                        </div>
+                        <div class="form-panel">
+                            <label>Photon Energy Unit</label>
+                            <select id="energyUnit" onchange="renderOpticalPlot()">
+                                <option value="eV" selected>eV (Electron-Volt)</option>
+                                <option value="Ry">Ry (Rydberg)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- اختيار مجال الطاقة المخصص (من 0 إلى قيمة محددة) -->
+                    <div class="grid-inputs" style="margin-bottom:0.75rem;">
+                        <div class="form-panel">
+                            <label>Energy Min (E_min)</label>
+                            <input type="number" id="eMin" step="any" value="0" placeholder="0" onchange="renderOpticalPlot()">
+                        </div>
+                        <div class="form-panel">
+                            <label>Energy Max (E_max)</label>
+                            <input type="number" id="eMax" step="any" placeholder="Auto" onchange="renderOpticalPlot()">
+                        </div>
+                    </div>
+
+                    <!-- نوع سلم المحور الرأسي -->
+                    <div class="grid-inputs" style="margin-bottom:0;">
+                        <div class="form-panel">
+                            <label>Response Axis Scale</label>
+                            <select id="yScale" onchange="renderOpticalPlot()">
+                                <option value="linear" selected>Linear Scale</option>
+                                <option value="log">Logarithmic Scale</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Tensor Direction & Tensor Components Input -->
+                <div class="glass-card">
+                    <h2>2. Tensor Polarization Components</h2>
+
+                    <div class="form-panel" style="margin-bottom: 0.75rem;">
+                        <label>Number of Directions/Polarizations</label>
+                        <input type="number" id="numTensors" min="1" value="1" oninput="buildTensorInputs()">
+                    </div>
+
+                    <div id="tensorsConfigContainer"></div>
+
+                    <button type="button" class="btn-cyan" onclick="generateDataFields()">Generate Data Fields</button>
+
+                    <div id="opticalDataBlock" class="hidden" style="margin-top: 1rem;">
+                        <div class="form-panel" style="margin-bottom: 0.75rem;">
+                            <label>Photon Energy Axis (E)</label>
+                            <textarea id="optX" placeholder="0.0&#10;0.1&#10;...&#10;20.0"></textarea>
+                        </div>
+
+                        <div id="tensorColumnsContainer" class="grid-inputs"></div>
+
+                        <label style="margin-top:0.5rem;">Polarization Visibility Toggles:</label>
+                        <div id="visibilityToggles" class="toggle-group"></div>
+
+                        <button type="button" class="btn-cyan" onclick="processOpticalData(); renderOpticalPlot();">Update Optical Plot</button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Visualization Column -->
+            <div class="visualization-column">
+                <div class="glass-card id-chart-container" style="min-height: 620px;">
+                    <div id="opticalPlot" style="width:100%; height:580px;"></div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        let opticalEnergyValues = [];
+        let tensorColumnsData = [];
+        let tensorColumnNames = [];
+
+        const RY_TO_EV = 13.6056980659;
+
+        // --- 1. Dynamic Tensor Directions Configuration ---
+        function buildTensorInputs() {
+            const count = parseInt(document.getElementById("numTensors").value) || 1;
+            const container = document.getElementById("tensorsConfigContainer");
+            container.innerHTML = "";
+
+            const defaultNames = ["xx (E || x)", "yy (E || y)", "zz (E || z)", "Average / Isotropic"];
+
+            for (let i = 0; i < count; i++) {
+                const defaultVal = defaultNames[i] || `Tensor Component ${i+1}`;
+                container.innerHTML += `
+                    <div class="tensor-block">
+                        <div class="form-panel">
+                            <label>Direction ${i+1} Name</label>
+                            <input type="text" class="tensor-label" value="${defaultVal}">
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        buildTensorInputs();
+
+        // --- 2. Dynamic Data Textarea Fields Generation ---
+        function generateDataFields() {
+            const container = document.getElementById("tensorColumnsContainer");
+            const toggleContainer = document.getElementById("visibilityToggles");
+            container.innerHTML = "";
+            toggleContainer.innerHTML = "";
+
+            const tensorBlocks = document.querySelectorAll(".tensor-label");
+            let colIndex = 0;
+
+            tensorBlocks.forEach((labelEl) => {
+                const label = labelEl.value.trim() || `Direction ${colIndex+1}`;
+
+                container.innerHTML += `
+                    <div class="form-panel">
+                        <label>${label}</label>
+                        <textarea class="opt-col-data" data-col="${colIndex}" placeholder="Data values..."></textarea>
+                    </div>
+                `;
+                toggleContainer.innerHTML += `
+                    <label class="toggle-item">
+                        <input type="checkbox" class="opt-vis-check" data-col="${colIndex}" checked onchange="renderOpticalPlot()"> ${label}
+                    </label>
+                `;
+                colIndex++;
+            });
+
+            document.getElementById("opticalDataBlock").classList.remove("hidden");
+        }
+
+        // --- 3. Process Input Data ---
+        function processOpticalData() {
+            opticalEnergyValues = document.getElementById("optX").value.trim().split('\n').map(Number);
+            const colTextareas = document.querySelectorAll(".opt-col-data");
+            const tensorBlocks = document.querySelectorAll(".tensor-label");
+
+            tensorColumnsData = [];
+            tensorColumnNames = [];
+
+            colTextareas.forEach((ta, idx) => {
+                const vals = ta.value.trim().split('\n').map(Number);
+                tensorColumnsData.push(vals);
+                
+                const label = tensorBlocks[idx] ? tensorBlocks[idx].value.trim() : `Col ${idx+1}`;
+                tensorColumnNames.push(label);
+            });
+        }
+
+        // --- 4. Dynamic Optical Spectrum Renderer ---
+        function renderOpticalPlot() {
+            if (opticalEnergyValues.length === 0 || tensorColumnsData.length === 0) {
+                Plotly.purge('opticalPlot');
+                return;
+            }
+
+            const funcType = document.getElementById("opticalFunc").value;
+            const unitType = document.getElementById("energyUnit").value;
+            const yScaleType = document.getElementById("yScale").value;
+            const unitLabel = unitType === "Ry" ? "Ry" : "eV";
+            const scaleFactor = unitType === "Ry" ? (1 / RY_TO_EV) : 1.0;
+
+            // تطبيق معامل التحويل على محور طاقة الفوتون
+            const scaledEnergies = opticalEnergyValues.map(v => v * scaleFactor);
+
+            // قراءة حدود مجال الطاقة
+            const customMin = parseFloat(document.getElementById("eMin").value);
+            const customMax = parseFloat(document.getElementById("eMax").value);
+            
+            // ضبط المدى الشاقولي للطاقة تلقائياً أو وفق خيار المستخدم
+            const eMinVal = !isNaN(customMin) ? customMin * scaleFactor : 0;
+            const eMaxVal = !isNaN(customMax) ? customMax * scaleFactor : Math.max(...scaledEnergies);
+
+            // العناوين الديناميكية حسب الدالة المختارة
+            const funcTitles = {
+                dielectric: "Dielectric Function ε(ω)",
+                absorption: "Absorption Coefficient α(ω)",
+                refraction: "Refractive Index (n, k)",
+                reflectivity: "Reflectivity R(ω)",
+                eels: "Electron Energy Loss Function (EELS)",
+                conductivity: "Optical Conductivity σ(ω)"
+            };
+
+            const yAxisLabels = {
+                dielectric: "ε₁ / ε₂",
+                absorption: "Absorption α (cm⁻¹)",
+                refraction: "Index (n / k)",
+                reflectivity: "Reflectivity R",
+                eels: "Loss Function L(ω)",
+                conductivity: "Conductivity σ (Ω⁻¹cm⁻¹)"
+            };
+
+            let traces = [];
+            const colors = ['#06b6d4', '#6366f1', '#10b981', '#fbbf24', '#f43f5e', '#a855f7'];
+            const visChecks = document.querySelectorAll(".opt-vis-check");
+
+            tensorColumnsData.forEach((colVals, idx) => {
+                const isVisible = visChecks[idx] ? visChecks[idx].checked : true;
+                if (isVisible) {
+                    let safeVals = colVals;
+                    if (yScaleType === "log") {
+                        safeVals = colVals.map(v => v <= 0 ? 1e-10 : v);
+                    }
+
+                    traces.push({
+                        x: scaledEnergies,
+                        y: safeVals,
+                        mode: 'lines',
+                        name: tensorColumnNames[idx] || `Component ${idx+1}`,
+                        line: { color: colors[idx % colors.length], width: 2 }
+                    });
+                }
+            });
+
+            let layout = {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 40, b: 60, l: 80, r: 30 },
+                showlegend: true,
+                legend: { font: { color: '#f8fafc' }, orientation: 'h', y: -0.2 },
+                title: {
+                    text: funcTitles[funcType],
+                    font: { color: '#f8fafc', size: 16 }
+                },
+                xaxis: {
+                    range: [eMinVal, eMaxVal],
+                    title: { text: `Photon Energy (${unitLabel})`, font: { color: '#f8fafc', size: 12 } },
+                    tickfont: { color: '#f8fafc', size: 11 },
+                    gridcolor: 'rgba(255,255,255,0.08)',
+                    showline: true, linecolor: '#94a3b8'
+                },
+                yaxis: {
+                    type: yScaleType,
+                    autorange: true,
+                    exponentformat: 'power',
+                    title: { text: yAxisLabels[funcType], font: { color: '#f8fafc', size: 12 } },
+                    tickfont: { color: '#f8fafc', size: 11 },
+                    gridcolor: 'rgba(255,255,255,0.08)',
+                    showline: true, linecolor: '#94a3b8'
+                }
+            };
+
+            Plotly.newPlot('opticalPlot', traces, layout, { responsive: true });
+        }
+    </script>
+</body>
+</html>

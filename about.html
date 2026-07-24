@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Researcher | Dr. Zoheir Akil</title>
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --glass-card: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-glow: #f8fafc;
+            --text-dim: #94a3b8;
+            --glow-indigo: #6366f1;
+            --glow-cyan: #06b6d4;
+            --glow-purple: #a855f7;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
+            color: var(--text-glow);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+
+        .about-container {
+            width: 100%;
+            max-width: 950px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(10, 15, 30, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 3rem;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .top-nav {
+            margin-bottom: 2rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--text-dim);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(99, 102, 241, 0.12);
+            border-color: rgba(165, 180, 252, 0.4);
+            color: var(--text-glow);
+        }
+
+        /* Profile Header Layout */
+        .profile-header {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            padding-bottom: 2.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 2.5rem;
+        }
+
+        /* Profile Image Placeholder */
+        .avatar-frame {
+            width: 160px;
+            height: 160px;
+            min-width: 160px;
+            border-radius: 24px;
+            background: var(--glass-card);
+            border: 2px dashed rgba(99, 102, 241, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transition: border-color 0.3s ease;
+        }
+
+        .avatar-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .avatar-placeholder {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            padding: 1rem;
+        }
+
+        .avatar-placeholder svg {
+            width: 36px;
+            height: 36px;
+            stroke: var(--glow-cyan);
+            fill: none;
+            stroke-width: 1.5;
+            margin-bottom: 0.4rem;
+        }
+
+        .profile-title h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 0.4rem 0;
+            background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .profile-title .subtitle {
+            color: var(--glow-cyan);
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        .profile-title p {
+            color: var(--text-dim);
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin: 0 0 1.2rem 0;
+        }
+
+        .contact-pills {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .pill {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            padding: 0.4rem 0.9rem;
+            border-radius: 12px;
+            font-size: 0.83rem;
+            color: var(--text-glow);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: fit-content;
+            transition: all 0.2s ease;
+        }
+
+        .pill:hover {
+            border-color: var(--glow-indigo);
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--glow-cyan);
+        }
+
+        /* Section Layouts */
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-glow);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: var(--glow-cyan);
+            border-radius: 2px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .info-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+        }
+
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(165, 180, 252, 0.2);
+            color: #c7d2fe;
+            padding: 0.3rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Publications List */
+        .pub-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .pub-item {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 1.1rem 1.3rem;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: var(--text-dim);
+            transition: border-color 0.2s ease;
+        }
+
+        .pub-item:hover {
+            border-color: rgba(165, 180, 252, 0.3);
+        }
+
+        .pub-item .pub-title {
+            color: var(--text-glow);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .pub-item .pub-meta {
+            font-size: 0.82rem;
+            color: var(--text-dim);
+        }
+
+        .pub-doi {
+            color: var(--glow-cyan);
+            text-decoration: none;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        .pub-doi:hover {
+            text-decoration: underline;
+        }
+
+        .tag-lead {
+            display: inline-block;
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: var(--glow-cyan);
+            font-size: 0.7rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            margin-bottom: 0.4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            .contact-pills {
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="about-container">
+        
+        <div class="top-nav">
+            <a href="index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Workbench
+            </a>
+        </div>
+
+		<!-- Header Profile Section -->
+        <header class="profile-header">
+            <div class="avatar-frame">
+                <img src="IMG.PNG" alt="Dr. Zoheir Akil">
+            </div>
+
+            <div class="profile-title">
+                <h1>Dr. Zoheir Akil</h1>
+                <div class="subtitle">Computational Materials Scientist | Ph.D.</div>
+                <p>Specializing in first-principles Density Functional Theory (DFT) simulations to investigate structural, electronic, optical, vibrational, and thermoelectric properties of advanced functional materials.</p>
+                
+                <div class="contact-pills">
+                    <a href="mailto:zoheir.akil.dz@gmail.com" class="pill">
+                        📧 Email: zoheir.akil.dz@gmail.com
+                    </a>
+                    <a href="https://scholar.google.com/citations?user=cg6mMisAAAAJ&hl=fr" target="_blank" class="pill">
+                        🎓 Google Scholar Profile
+                    </a>
+                    <a href="https://orcid.org/0000-0001-8787-527X" target="_blank" class="pill">
+                        🆔 ORCID: 0000-0001-8787-527X
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Grid: Education & Expertise -->
+        <div class="grid-2">
+            <div class="info-card">
+                <div class="section-title">Education</div>
+                <div style="margin-bottom: 0.8rem;">
+                    <strong style="color: var(--text-glow);">Ph.D. in Materials Science</strong> <span style="color: var(--text-dim); font-size: 0.85rem;">(2022)</span>
+                    <div style="font-size: 0.85rem; color: var(--text-dim);">University of Saida, Algeria</div>
+                </div>
+                <div style="margin-bottom: 0.8rem;">
+                    <strong style="color: var(--text-glow);">M.Sc. in Materials Science</strong> <span style="color: var(--text-dim); font-size: 0.85rem;">(2018)</span>
+                    <div style="font-size: 0.85rem; color: var(--glow-cyan);">Graduated Top of Class</div>
+                </div>
+                <div>
+                    <strong style="color: var(--text-glow);">B.Sc. in Physics & Materials</strong> <span style="color: var(--text-dim); font-size: 0.85rem;">(2016)</span>
+                    <div style="font-size: 0.85rem; color: var(--glow-cyan);">Graduated Top of Class</div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="section-title">Computational Toolkit</div>
+                <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.5rem;">DFT & Simulation Codes:</div>
+                <div class="badge-list" style="margin-bottom: 1rem;">
+                    <span class="badge">WIEN2k</span>
+                    <span class="badge">Quantum ESPRESSO</span>
+                    <span class="badge">Elk</span>
+					<span class="badge">VASP</span>
+					<span class="badge">CASTEP</span>
+                    <span class="badge">BoltzTraP</span>
+                    <span class="badge">GIBBS</span>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.5rem;">Development & Scripting:</div>
+                <div class="badge-list">
+                    <span class="badge">Python</span>
+                    <span class="badge">Fortran</span>
+                    <span class="badge">HTML/CSS/JS</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Peer-Reviewed Publications -->
+        <div class="section-title">Peer-Reviewed Publications</div>
+        <div class="pub-list">
+            
+            <!-- First Author Publications -->
+            <div class="pub-item">
+                <span class="tag-lead">First Author</span>
+                <span class="pub-title">First-principles study of structural, dynamical, elastic, electronic, optical, and thermodynamic properties of Na₂ZnSnS₄ compound</span>
+                <span class="pub-meta">Canadian Journal of Physics 100 (9), 405-422 (2022)</span>
+                <a class="pub-doi" href="https://doi.org/10.1139/cjp-2022-0029" target="_blank">[DOI: 10.1139/cjp-2022-0029]</a>
+            </div>
+
+            <div class="pub-item">
+                <span class="tag-lead">First Author</span>
+                <span class="pub-title">Enhancing second harmonic generation response in infrared nonlinear optical material through Pb substitution: a study of Li₂PbSiS₄ compound</span>
+                <span class="pub-meta">Optik 294, 171441 (2023)</span>
+                <a class="pub-doi" href="https://doi.org/10.1016/j.ijleo.2023.171441" target="_blank">[DOI: 10.1016/j.ijleo.2023.171441]</a>
+            </div>
+
+            <!-- Co-Authored Publications -->
+            <div class="pub-item">
+                <span class="pub-title">Prediction of the structural, elastic, electronic, and thermoelectric properties of quaternary Heusler compounds TaSiFeMn, TaAlCuCo, and SrBaZnSi</span>
+                <span class="pub-meta">International Journal of Modern Physics B (2026)</span>
+                <a class="pub-doi" href="https://doi.org/10.1142/S0217979226501936" target="_blank">[DOI: 10.1142/S0217979226501936]</a>
+            </div>
+
+            <div class="pub-item">
+                <span class="pub-title">The magnetic, electronic, elastic, and optical properties of the double perovskite Cs₂KGdCl₆</span>
+                <span class="pub-meta">International Journal of Modern Physics B 39 (25), 2550235 (2025)</span>
+                <a class="pub-doi" href="https://doi.org/10.1142/S0217979225502352" target="_blank">[DOI: 10.1142/S0217979225502352]</a>
+            </div>
+
+            <div class="pub-item">
+                <span class="pub-title">Effect of the spin-orbit coupling and Hubbard corrections in predicting the electronic and magnetic properties of vacancy-ordered double perovskites A₂WCl₆ (A = Cs, Rb, K)</span>
+                <span class="pub-meta">Physica Scripta 99 (6), 0659b5 (2024)</span>
+                <a class="pub-doi" href="https://doi.org/10.1088/1402-4896/ad4c1a" target="_blank">[DOI: 10.1088/1402-4896/ad4c1a]</a>
+            </div>
+
+            <div class="pub-item">
+                <span class="pub-title">Structural, elastic, electronic, optic and thermodynamic properties of Li₂BaSnX₄ (X= S and Se) alloys: A first-principle study</span>
+                <span class="pub-meta">Computational Condensed Matter 32, e00718 (2022)</span>
+                <a class="pub-doi" href="https://doi.org/10.1016/j.cocom.2022.e00718" target="_blank">[DOI: 10.1016/j.cocom.2022.e00718]</a>
+            </div>
+
+            <div class="pub-item">
+                <span class="pub-title">New half-metallic ferromagnetic oxides XBe₃O₄ (X= Li and Na)</span>
+                <span class="pub-meta">Computational Condensed Matter 31, e00665 (2022)</span>
+                <a class="pub-doi" href="https://doi.org/10.1016/j.cocom.2022.e00665" target="_blank">[DOI: 10.1016/j.cocom.2022.e00665]</a>
+            </div>
+
+            <div class="pub-item">
+                <span class="pub-title">Theoretical investigation on tautomerism and NLO properties of salicylideneaniline derivatives</span>
+                <span class="pub-meta">Canadian Journal of Physics 99 (12), 1095-1104 (2021)</span>
+                <a class="pub-doi" href="https://doi.org/10.1139/cjp-2021-0175" target="_blank">[DOI: 10.1139/cjp-2021-0175]</a>
+            </div>
+
+            <div class="pub-item">
+                <span class="pub-title">New stable half-metallic ferromagnetic structure of KO</span>
+                <span class="pub-meta">Phase Transitions 93 (2), 217-227 (2020)</span>
+                <a class="pub-doi" href="https://doi.org/10.1080/01411594.2019.1709121" target="_blank">[DOI: 10.1080/01411594.2019.1709121]</a>
+            </div>
+
+        </div>
+
+        <footer>
+            <p>&copy; 2026 <strong>ZA-Materials Workbench</strong> | Designed by Dr. Zoheir Akil</p>
+        </footer>
+    </div>
+
+</body>
+</html>
